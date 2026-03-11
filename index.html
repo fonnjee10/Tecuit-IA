@@ -43,7 +43,7 @@ tailwind.config = {
       }
     }
   }
-}
+};
 </script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,7 +54,7 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
 .message-bubble { max-width: 85%; border-radius: 18px; padding: 12px 16px; line-height: 1.6; font-size: 0.95rem; word-wrap: break-word; white-space: pre-wrap; animation: bounceIn 0.4s ease-out; }
 .user-msg { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
 .ai-msg { background-color: rgba(24, 24, 27, 0.8); color: #e4e4e7; align-self: flex-start; padding-left: 0; border: 1px solid rgba(99, 102, 241, 0.2); }
-.model-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); animation: pulse 2s infinite; }
+.model-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
 .sheet-handle { width: 40px; height: 4px; background-color: #3f3f46; border-radius: 2px; margin: 0 auto 16px auto; transition: background-color 0.3s; }
 .sheet-handle:hover { background-color: #6366f1; }
 .feature-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -170,42 +170,42 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
       <div class="sheet-handle"></div>
       <h3 class="text-center font-semibold text-lg mb-4">Options Tecuit</h3>
       <div class="grid grid-cols-3 gap-3 mb-6">
-        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" data-action="camera">
+        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('camera')">
           <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-solid fa-camera text-xl"></i></div>
           <span class="text-xs font-medium">Caméra</span>
         </button>
-        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" data-action="photos">
+        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('photos')">
           <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-regular fa-image text-xl"></i></div>
           <span class="text-xs font-medium">Photos</span>
         </button>
-        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" data-action="files">
+        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('files')">
           <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-solid fa-paperclip text-xl"></i></div>
           <span class="text-xs font-medium">Fichiers</span>
         </button>
       </div>
       <div class="h-px bg-tecuit-border w-full mb-4"></div>
       <div class="flex flex-col gap-1 pb-6">
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Créer une image">
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Créer une image')">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20"><i class="fa-solid fa-wand-magic-sparkles text-lg"></i></div>
           <div class="text-left flex-1"><h4 class="font-medium text-sm">Créer une image</h4><p class="text-xs text-tecuit-subtext">Visualisez n'importe quoi</p></div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Raisonnement avancé">
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Raisonnement avancé')">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-amber-400 border border-amber-500/20"><i class="fa-regular fa-lightbulb text-lg"></i></div>
           <div class="text-left flex-1"><h4 class="font-medium text-sm">Raisonnement avancé</h4><p class="text-xs text-tecuit-subtext">Réfléchir plus longtemps</p></div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Recherche approfondie">
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche approfondie')">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20"><i class="fa-solid fa-magnifying-glass-chart text-lg"></i></div>
           <div class="text-left flex-1"><h4 class="font-medium text-sm">Recherche approfondie</h4><p class="text-xs text-tecuit-subtext">Rapports détaillés</p></div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Recherche sur Internet">
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche sur Internet')">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20"><i class="fa-solid fa-globe text-lg"></i></div>
           <div class="text-left flex-1"><h4 class="font-medium text-sm">Recherche sur Internet</h4><p class="text-xs text-tecuit-subtext">Infos en temps réel</p></div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Étudier et apprendre">
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Étudier et apprendre')">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20"><i class="fa-solid fa-book-open text-lg"></i></div>
           <div class="text-left flex-1"><h4 class="font-medium text-sm">Étudier et apprendre</h4><p class="text-xs text-tecuit-subtext">Nouveaux concepts</p></div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
@@ -285,7 +285,7 @@ const LOGO_URL = 'https://image.qwenlm.ai/public_source/13d5dabe-33b4-49b1-9ab0-
 let currentModel = 'Hermes 4B';
 let abortController = null;
 let conversationHistory = [];
-let conversations = [];
+let conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
 let currentConversationId = null;
 let isGenerating = false;
 let currentResponseContent = '';
@@ -294,15 +294,12 @@ let currentMessageElement = null;
 // ==================== DOM ELEMENTS ====================
 let chatContainer, input, sendBtn, stopGenBtn, stopButtonContainer, typingPreview;
 let currentModelDisplay, conversationList, toast, toastMessage, fileInput;
-let sidebar, bottomSheet, sheetBackdrop, sheetContent;
-let modelModal, menuModal, modelBackdrop, menuBackdrop;
 
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', function() {
   initDOMElements();
-  loadConversations();
-  initializeConversation();
   setupEventListeners();
+  initializeConversation();
   renderConversationList();
   addWelcomeMessage();
   loadFromLocalStorage();
@@ -321,22 +318,6 @@ function initDOMElements() {
   toast = document.getElementById('toast');
   toastMessage = document.getElementById('toast-message');
   fileInput = document.getElementById('fileInput');
-  sidebar = document.getElementById('sidebar');
-  bottomSheet = document.getElementById('bottom-sheet');
-  sheetBackdrop = document.getElementById('sheet-backdrop');
-  sheetContent = document.getElementById('sheet-content');
-  modelModal = document.getElementById('model-modal');
-  menuModal = document.getElementById('menu-modal');
-  modelBackdrop = document.getElementById('modelBackdrop');
-  menuBackdrop = document.getElementById('menuBackdrop');
-}
-
-function loadConversations() {
-  try {
-    conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
-  } catch (e) {
-    conversations = [];
-  }
 }
 
 function initializeConversation() {
@@ -349,64 +330,38 @@ function initializeConversation() {
   }
 }
 
-// ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
+  // Sidebar
   document.getElementById('sidebarBtn').addEventListener('click', toggleSidebar);
   document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
   document.getElementById('newConversationBtn').addEventListener('click', newConversation);
   
-  document.getElementById('modelBtn').addEventListener('click', function() {
-    modelModal.classList.remove('hidden');
-  });
-  document.getElementById('closeModelBtn').addEventListener('click', function() {
-    modelModal.classList.add('hidden');
-  });
-  modelBackdrop.addEventListener('click', function() {
-    modelModal.classList.add('hidden');
-  });
+  // Model Selector
+  document.getElementById('modelBtn').addEventListener('click', toggleModelSelector);
+  document.getElementById('closeModelBtn').addEventListener('click', toggleModelSelector);
+  document.getElementById('modelBackdrop').addEventListener('click', toggleModelSelector);
   
   document.querySelectorAll('.model-option').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const modelName = this.getAttribute('data-model');
-      selectModel(modelName);
+      const model = this.getAttribute('data-model');
+      selectModel(model);
     });
   });
   
-  document.getElementById('menuBtn').addEventListener('click', function() {
-    menuModal.classList.remove('hidden');
-  });
-  document.getElementById('closeMenuBtn').addEventListener('click', function() {
-    menuModal.classList.add('hidden');
-  });
-  menuBackdrop.addEventListener('click', function() {
-    menuModal.classList.add('hidden');
-  });
-  
+  // Menu
+  document.getElementById('menuBtn').addEventListener('click', toggleMenu);
+  document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
+  document.getElementById('menuBackdrop').addEventListener('click', toggleMenu);
   document.getElementById('exportBtn').addEventListener('click', exportConversation);
   document.getElementById('clearBtn').addEventListener('click', clearConversation);
   document.getElementById('newChatBtn').addEventListener('click', newConversation);
   
+  // Chat
   sendBtn.addEventListener('click', sendMessage);
   stopGenBtn.addEventListener('click', stopGeneration);
   
   document.getElementById('attachBtn').addEventListener('click', function() {
-    openBottomSheet();
-  });
-  
-  document.querySelectorAll('[data-action]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const action = this.getAttribute('data-action');
-      closeBottomSheet();
-      triggerFileUpload(action);
-    });
-  });
-  
-  document.querySelectorAll('[data-feature]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const feature = this.getAttribute('data-feature');
-      closeBottomSheet();
-      activateFeature(feature);
-    });
+    toggleBottomSheet(true);
   });
   
   input.addEventListener('keydown', function(e) {
@@ -429,41 +384,61 @@ function setupEventListeners() {
     }
   });
   
-  sheetBackdrop.addEventListener('click', function() {
-    closeBottomSheet();
+  document.getElementById('sheet-backdrop').addEventListener('click', function() {
+    toggleBottomSheet(false);
   });
   
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      closeBottomSheet();
-      modelModal.classList.add('hidden');
-      menuModal.classList.add('hidden');
-      sidebar.classList.add('-translate-x-full');
+      toggleBottomSheet(false);
+      toggleModelSelector();
+      toggleMenu();
+      closeSidebar();
     }
   });
 }
 
 // ==================== UI FUNCTIONS ====================
 function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
   sidebar.classList.toggle('-translate-x-full');
 }
 
-function openBottomSheet() {
-  bottomSheet.classList.remove('pointer-events-none');
-  sheetBackdrop.classList.remove('opacity-0');
-  sheetContent.classList.remove('translate-y-full');
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.add('-translate-x-full');
 }
 
-function closeBottomSheet() {
-  bottomSheet.classList.add('pointer-events-none');
-  sheetBackdrop.classList.add('opacity-0');
-  sheetContent.classList.add('translate-y-full');
+function toggleBottomSheet(show) {
+  const sheet = document.getElementById('bottom-sheet');
+  const backdrop = document.getElementById('sheet-backdrop');
+  const content = document.getElementById('sheet-content');
+  
+  if (show) {
+    sheet.classList.remove('pointer-events-none');
+    backdrop.classList.remove('opacity-0');
+    content.classList.remove('translate-y-full');
+  } else {
+    sheet.classList.add('pointer-events-none');
+    backdrop.classList.add('opacity-0');
+    content.classList.add('translate-y-full');
+  }
+}
+
+function toggleModelSelector() {
+  const modal = document.getElementById('model-modal');
+  modal.classList.toggle('hidden');
+}
+
+function toggleMenu() {
+  const modal = document.getElementById('menu-modal');
+  modal.classList.toggle('hidden');
 }
 
 function selectModel(modelName) {
   currentModel = modelName;
   currentModelDisplay.textContent = modelName;
-  modelModal.classList.add('hidden');
+  toggleModelSelector();
   addSystemMessage('Modèle changé pour <strong>' + modelName + '</strong>');
   showToast('Modèle ' + modelName + ' activé');
   
@@ -475,6 +450,7 @@ function selectModel(modelName) {
 }
 
 function activateFeature(featureName) {
+  toggleBottomSheet(false);
   input.value = featureName + ': ';
   input.focus();
   updateSendButtonState();
@@ -482,6 +458,7 @@ function activateFeature(featureName) {
 }
 
 function triggerFileUpload(type) {
+  toggleBottomSheet(false);
   if (type === 'camera') {
     fileInput.setAttribute('capture', 'environment');
     fileInput.setAttribute('accept', 'image/*');
@@ -540,7 +517,7 @@ function createNewConversation() {
 function newConversation() {
   saveCurrentConversation();
   createNewConversation();
-  sidebar.classList.add('-translate-x-full');
+  closeSidebar();
   chatContainer.innerHTML = '';
   conversationHistory = [];
   currentResponseContent = '';
@@ -576,7 +553,7 @@ function loadConversation(convId) {
     currentMessageElement = null;
     renderConversation();
   }
-  sidebar.classList.add('-translate-x-full');
+  closeSidebar();
 }
 
 function saveConversations() {
@@ -660,8 +637,7 @@ function addWelcomeMessage() {
     '<p class="text-xs text-tecuit-subtext">10GB Mémoire</p>' +
     '</div>' +
     '</div>' +
-    '</div>' +
-    '</div>';
+    '</div></div>';
   
   const div = document.createElement('div');
   div.className = 'flex justify-center w-full';
