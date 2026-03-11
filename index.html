@@ -79,7 +79,6 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
 @keyframes messageEnter { 0% { opacity: 0; transform: translateY(20px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 .code-block { background: #0d0d0f; border: 1px solid #27272a; border-radius: 8px; padding: 12px; margin: 8px 0; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; }
 .welcome-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 20px; padding: 24px; animation: float 3s ease-in-out infinite; }
-.active-model { border-color: #6366f1 !important; background: rgba(99, 102, 241, 0.15) !important; }
 </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -286,20 +285,24 @@ const LOGO_URL = 'https://image.qwenlm.ai/public_source/13d5dabe-33b4-49b1-9ab0-
 let currentModel = 'Hermes 4B';
 let abortController = null;
 let conversationHistory = [];
-let conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
+let conversations = [];
 let currentConversationId = null;
 let isGenerating = false;
 let currentResponseContent = '';
 let currentMessageElement = null;
 
 // ==================== DOM ELEMENTS ====================
-let chatContainer, input, sendBtn, stopGenBtn, stopButtonContainer, typingPreview, currentModelDisplay, conversationList, toast, toastMessage, fileInput;
+let chatContainer, input, sendBtn, stopGenBtn, stopButtonContainer, typingPreview;
+let currentModelDisplay, conversationList, toast, toastMessage, fileInput;
+let sidebar, bottomSheet, sheetBackdrop, sheetContent;
+let modelModal, menuModal, modelBackdrop, menuBackdrop;
 
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', function() {
   initDOMElements();
-  setupEventListeners();
+  loadConversations();
   initializeConversation();
+  setupEventListeners();
   renderConversationList();
   addWelcomeMessage();
   loadFromLocalStorage();
@@ -318,47 +321,82 @@ function initDOMElements() {
   toast = document.getElementById('toast');
   toastMessage = document.getElementById('toast-message');
   fileInput = document.getElementById('fileInput');
+  sidebar = document.getElementById('sidebar');
+  bottomSheet = document.getElementById('bottom-sheet');
+  sheetBackdrop = document.getElementById('sheet-backdrop');
+  sheetContent = document.getElementById('sheet-content');
+  modelModal = document.getElementById('model-modal');
+  menuModal = document.getElementById('menu-modal');
+  modelBackdrop = document.getElementById('modelBackdrop');
+  menuBackdrop = document.getElementById('menuBackdrop');
 }
 
+function loadConversations() {
+  try {
+    conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
+  } catch (e) {
+    conversations = [];
+  }
+}
+
+function initializeConversation() {
+  if (conversations.length === 0) {
+    createNewConversation();
+  } else {
+    currentConversationId = conversations[0].id;
+    currentModel = conversations[0].model || 'Hermes 4B';
+    currentModelDisplay.textContent = currentModel;
+  }
+}
+
+// ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
-  // Sidebar
   document.getElementById('sidebarBtn').addEventListener('click', toggleSidebar);
   document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
   document.getElementById('newConversationBtn').addEventListener('click', newConversation);
   
-  // Model Selector
-  document.getElementById('modelBtn').addEventListener('click', toggleModelSelector);
-  document.getElementById('closeModelBtn').addEventListener('click', toggleModelSelector);
-  document.getElementById('modelBackdrop').addEventListener('click', toggleModelSelector);
+  document.getElementById('modelBtn').addEventListener('click', function() {
+    modelModal.classList.remove('hidden');
+  });
+  document.getElementById('closeModelBtn').addEventListener('click', function() {
+    modelModal.classList.add('hidden');
+  });
+  modelBackdrop.addEventListener('click', function() {
+    modelModal.classList.add('hidden');
+  });
   
   document.querySelectorAll('.model-option').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const model = this.getAttribute('data-model');
-      selectModel(model);
+      const modelName = this.getAttribute('data-model');
+      selectModel(modelName);
     });
   });
   
-  // Menu
-  document.getElementById('menuBtn').addEventListener('click', toggleMenu);
-  document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
-  document.getElementById('menuBackdrop').addEventListener('click', toggleMenu);
+  document.getElementById('menuBtn').addEventListener('click', function() {
+    menuModal.classList.remove('hidden');
+  });
+  document.getElementById('closeMenuBtn').addEventListener('click', function() {
+    menuModal.classList.add('hidden');
+  });
+  menuBackdrop.addEventListener('click', function() {
+    menuModal.classList.add('hidden');
+  });
+  
   document.getElementById('exportBtn').addEventListener('click', exportConversation);
   document.getElementById('clearBtn').addEventListener('click', clearConversation);
   document.getElementById('newChatBtn').addEventListener('click', newConversation);
   
-  // Chat
   sendBtn.addEventListener('click', sendMessage);
   stopGenBtn.addEventListener('click', stopGeneration);
   
   document.getElementById('attachBtn').addEventListener('click', function() {
-    toggleBottomSheet(true);
+    openBottomSheet();
   });
   
-  // Bottom Sheet Features
   document.querySelectorAll('[data-action]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const action = this.getAttribute('data-action');
-      toggleBottomSheet(false);
+      closeBottomSheet();
       triggerFileUpload(action);
     });
   });
@@ -366,12 +404,11 @@ function setupEventListeners() {
   document.querySelectorAll('[data-feature]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const feature = this.getAttribute('data-feature');
-      toggleBottomSheet(false);
+      closeBottomSheet();
       activateFeature(feature);
     });
   });
   
-  // Input
   input.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -386,70 +423,47 @@ function setupEventListeners() {
     updateSendButtonState();
   });
   
-  // File Input
   fileInput.addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) {
       handleFileUpload(e.target.files[0]);
     }
   });
   
-  // Sheet Backdrop
-  document.getElementById('sheet-backdrop').addEventListener('click', function() {
-    toggleBottomSheet(false);
+  sheetBackdrop.addEventListener('click', function() {
+    closeBottomSheet();
   });
   
-  // Escape Key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      toggleBottomSheet(false);
-      toggleModelSelector();
-      toggleMenu();
-      closeSidebar();
+      closeBottomSheet();
+      modelModal.classList.add('hidden');
+      menuModal.classList.add('hidden');
+      sidebar.classList.add('-translate-x-full');
     }
   });
 }
 
 // ==================== UI FUNCTIONS ====================
 function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
   sidebar.classList.toggle('-translate-x-full');
 }
 
-function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.classList.add('-translate-x-full');
+function openBottomSheet() {
+  bottomSheet.classList.remove('pointer-events-none');
+  sheetBackdrop.classList.remove('opacity-0');
+  sheetContent.classList.remove('translate-y-full');
 }
 
-function toggleBottomSheet(show) {
-  const sheet = document.getElementById('bottom-sheet');
-  const backdrop = document.getElementById('sheet-backdrop');
-  const content = document.getElementById('sheet-content');
-  
-  if (show) {
-    sheet.classList.remove('pointer-events-none');
-    backdrop.classList.remove('opacity-0');
-    content.classList.remove('translate-y-full');
-  } else {
-    sheet.classList.add('pointer-events-none');
-    backdrop.classList.add('opacity-0');
-    content.classList.add('translate-y-full');
-  }
-}
-
-function toggleModelSelector() {
-  const modal = document.getElementById('model-modal');
-  modal.classList.toggle('hidden');
-}
-
-function toggleMenu() {
-  const modal = document.getElementById('menu-modal');
-  modal.classList.toggle('hidden');
+function closeBottomSheet() {
+  bottomSheet.classList.add('pointer-events-none');
+  sheetBackdrop.classList.add('opacity-0');
+  sheetContent.classList.add('translate-y-full');
 }
 
 function selectModel(modelName) {
   currentModel = modelName;
   currentModelDisplay.textContent = modelName;
-  toggleModelSelector();
+  modelModal.classList.add('hidden');
   addSystemMessage('Modèle changé pour <strong>' + modelName + '</strong>');
   showToast('Modèle ' + modelName + ' activé');
   
@@ -526,7 +540,7 @@ function createNewConversation() {
 function newConversation() {
   saveCurrentConversation();
   createNewConversation();
-  closeSidebar();
+  sidebar.classList.add('-translate-x-full');
   chatContainer.innerHTML = '';
   conversationHistory = [];
   currentResponseContent = '';
@@ -562,7 +576,7 @@ function loadConversation(convId) {
     currentMessageElement = null;
     renderConversation();
   }
-  closeSidebar();
+  sidebar.classList.add('-translate-x-full');
 }
 
 function saveConversations() {
