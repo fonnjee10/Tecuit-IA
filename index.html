@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tecuit IA - Assistant Intelligent</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Fontsource Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        tecuit: {
+                            dark: '#09090b',
+                            card: '#18181b',
+                            accent: '#6366f1',
+                            accentHover: '#4f46e5',
+                            border: '#27272a',
+                            text: '#e4e4e7',
+                            subtext: '#a1a1aa'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'typing': 'typing 1.5s infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)' },
+                            '100%': { transform: 'translateY(0)' },
+                        },
+                        typing: {
+                            '0%, 100%': { opacity: '0.3' },
+                            '50%': { opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+
+        .message-bubble {
+            max-width: 85%;
+            border-radius: 18px;
+            padding: 12px 16px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .user-msg {
+            background-color: #27272a;
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-msg {
+            background-color: transparent;
+            color: #e4e4e7;
+            align-self: flex-start;
+            padding-left: 0;
+        }
+
+        .model-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background-color: #3f3f46;
+            border-radius: 2px;
+            margin: 0 auto 16px auto;
+        }
+
+        .feature-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #a1a1aa;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between px-4 py-3 bg-tecuit-dark/95 backdrop-blur-md border-b border-tecuit-border z-30 flex-shrink-0">
+        <div class="flex items-center gap-3">
+            <button id="sidebarBtn" class="text-tecuit-subtext hover:text-white transition-colors p-2">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center gap-2">
+                <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-8 h-8 rounded-full object-cover border border-tecuit-accent/30">
+                <h1 class="font-semibold text-lg tracking-tight">Tecuit</h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="modelBtn" class="flex items-center gap-2 bg-tecuit-card px-3 py-1.5 rounded-full border border-tecuit-border hover:border-tecuit-accent/50 transition-all">
+                <span class="text-xs font-medium text-tecuit-subtext" id="current-model-display">Hermes 4B</span>
+                <i class="fa-solid fa-chevron-down text-xs text-tecuit-subtext"></i>
+            </button>
+            <button id="newChatBtn" class="text-tecuit-subtext hover:text-white p-2" title="Nouvelle conversation">
+                <i class="fa-regular fa-pen-to-square text-lg"></i>
+            </button>
+            <button id="menuBtn" class="text-tecuit-subtext hover:text-white p-2">
+                <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-tecuit-card border-r border-tecuit-border transform -translate-x-full transition-transform duration-300 z-40">
+        <div class="p-4 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="font-semibold text-lg">Conversations</h2>
+                <button id="closeSidebarBtn" class="text-tecuit-subtext hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <button id="newConversationBtn" class="w-full bg-tecuit-accent hover:bg-tecuit-accentHover text-white py-3 rounded-xl mb-4 flex items-center justify-center gap-2 transition-colors">
+                <i class="fa-solid fa-plus"></i>
+                <span>Nouvelle conversation</span>
+            </button>
+
+            <div class="flex-1 overflow-y-auto">
+                <div class="text-xs text-tecuit-subtext mb-2">Aujourd'hui</div>
+                <div id="conversation-list" class="space-y-2">
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-tecuit-border">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-tecuit-dark/50">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-tecuit-accent to-purple-500 flex items-center justify-center">
+                        <span class="font-bold text-sm">U</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-medium text-sm">Utilisateur</div>
+                        <div class="text-xs text-tecuit-subtext">3.5GB / 10GB utilisé</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+    </main>
+
+    <!-- Input Area -->
+    <div class="p-4 bg-tecuit-dark border-t border-tecuit-border z-30 flex-shrink-0">
+        
+        <div id="typingPreview" class="hidden mb-2 px-2 text-xs text-tecuit-subtext italic truncate"></div>
+
+        <div id="stopButtonContainer" class="hidden mb-2 flex justify-center">
+            <button id="stopGenBtn" class="bg-tecuit-card border border-tecuit-border text-white text-sm px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 hover:bg-red-900/30 hover:border-red-500/50 transition-all glow-effect">
+                <i class="fa-solid fa-stop text-red-400"></i>
+                <span>Arrêter la génération</span>
+            </button>
+        </div>
+
+        <div class="flex items-end gap-2 bg-tecuit-card border border-tecuit-border rounded-2xl p-2 shadow-lg">
+            <button id="attachBtn" class="p-3 text-tecuit-accent hover:bg-tecuit-border/50 rounded-xl transition-colors flex-shrink-0" title="Plus d'options">
+                <i class="fa-solid fa-plus text-lg"></i>
+            </button>
+
+            <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-white placeholder-tecuit-subtext focus:outline-none resize-none py-3 max-h-32" placeholder="Message Tecuit..."></textarea>
+            
+            <button id="sendBtn" class="p-3 bg-tecuit-accent text-white rounded-xl hover:bg-tecuit-accentHover transition-colors flex-shrink-0 shadow-md shadow-indigo-500/20">
+                <i class="fa-solid fa-arrow-up text-sm"></i>
+            </button>
+        </div>
+        <div class="text-center mt-2">
+            <p class="text-[10px] text-tecuit-subtext">Tecuit IA peut faire des erreurs. Vérifiez les informations importantes.</p>
+        </div>
+    </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="fileInput" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt">
+
+    <!-- Bottom Sheet (Features Menu) -->
+    <div id="bottom-sheet" class="fixed inset-0 z-50 pointer-events-none">
+        <div id="sheet-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+        <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-tecuit-card border-t border-tecuit-border rounded-t-3xl transform translate-y-full transition-transform duration-300 pointer-events-auto max-h-[85vh] flex flex-col">
+            <div class="p-4 pb-2 overflow-y-auto">
+                <div class="sheet-handle"></div>
+                <h3 class="text-center font-semibold text-lg mb-4">Options Tecuit</h3>
+                
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('camera')">
+                        <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+                            <i class="fa-solid fa-camera text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium">Caméra</span>
+                    </button>
+                    <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('photos')">
+                        <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+                            <i class="fa-regular fa-image text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium">Photos</span>
+                    </button>
+                    <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('files')">
+                        <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+                            <i class="fa-solid fa-paperclip text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium">Fichiers</span>
+                    </button>
+                </div>
+
+                <div class="h-px bg-tecuit-border w-full mb-4"></div>
+
+                <div class="flex flex-col gap-1 pb-6">
+                    <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Créer une image')">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20">
+                            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <h4 class="font-medium text-sm">Créer une image</h4>
+                            <p class="text-xs text-tecuit-subtext">Visualisez n'importe quoi</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
+                    </button>
+
+                    <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Raisonnement avancé')">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-amber-400 border border-amber-500/20">
+                            <i class="fa-regular fa-lightbulb text-lg"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <h4 class="font-medium text-sm">Raisonnement avancé</h4>
+                            <p class="text-xs text-tecuit-subtext">Réfléchir plus longtemps</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
+                    </button>
+
+                    <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche approfondie')">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                            <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <h4 class="font-medium text-sm">Recherche approfondie</h4>
+                            <p class="text-xs text-tecuit-subtext">Rapports détaillés</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
+                    </button>
+
+                    <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche sur Internet')">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                            <i class="fa-solid fa-globe text-lg"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <h4 class="font-medium text-sm">Recherche sur Internet</h4>
+                            <p class="text-xs text-tecuit-subtext">Infos en temps réel</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
+                    </button>
+
+                    <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Étudier et apprendre')">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                            <i class="fa-solid fa-book-open text-lg"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <h4 class="font-medium text-sm">Étudier et apprendre</h4>
+                            <p class="text-xs text-tecuit-subtext">Nouveaux concepts</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Selector Modal -->
+    <div id="model-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modelBackdrop"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-fade-in">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold">Sélectionner le modèle</h3>
+                    <button id="closeModelBtn" class="text-tecuit-subtext hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-tecuit-subtext mb-6">Choisissez l'IA adaptée à vos besoins.</p>
+                
+                <div class="space-y-3">
+                    <button class="model-option w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all" data-model="Hermes 4B">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-white">Hermes 4B</span>
+                            <span class="text-xs bg-tecuit-border px-2 py-1 rounded text-tecuit-subtext">Rapide</span>
+                        </div>
+                        <p class="text-xs text-tecuit-subtext">Idéal pour les tâches quotidiennes et la rapidité.</p>
+                    </button>
+
+                    <button class="model-option w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all" data-model="Hermes 7B">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-white">Hermes 7B</span>
+                            <span class="text-xs bg-indigo-900/50 text-indigo-300 px-2 py-1 rounded border border-indigo-500/30">Puissant</span>
+                        </div>
+                        <p class="text-xs text-tecuit-subtext">Meilleur pour le raisonnement complexe et le code.</p>
+                    </button>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-tecuit-border">
+                    <div class="flex items-center justify-between text-xs text-tecuit-subtext mb-2">
+                        <span>Mémoire utilisateur</span>
+                        <span>3.5GB / 10GB</span>
+                    </div>
+                    <div class="w-full h-2 bg-tecuit-border rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-tecuit-accent to-purple-500 w-[35%]"></div>
+                    </div>
+                    <p class="text-[10px] text-tecuit-subtext mt-2">10GB de stockage pour la continuité des conversations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Modal -->
+    <div id="menu-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="menuBackdrop"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-fade-in">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold">Options</h3>
+                    <button id="closeMenuBtn" class="text-tecuit-subtext hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-2">
+                    <button id="exportBtn" class="w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-sm">Exporter la conversation</div>
+                            <div class="text-xs text-tecuit-subtext">Télécharger en JSON</div>
+                        </div>
+                    </button>
+
+                    <button id="clearBtn" class="w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-red-500/50 transition-all flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400">
+                            <i class="fa-solid fa-trash"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-sm">Effacer la conversation</div>
+                            <div class="text-xs text-tecuit-subtext">Supprimer l'historique</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-tecuit-border text-center">
+                    <p class="text-xs text-tecuit-subtext">Tecuit IA v1.0.0</p>
+                    <p class="text-[10px] text-tecuit-subtext mt-1">Backend: https://zenkaritecuitai.ngrok.app</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-tecuit-card border border-tecuit-border px-6 py-3 rounded-full shadow-xl z-50 transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-tecuit-accent"></i>
+            <span id="toast-message" class="text-sm">Notification</span>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const API_BASE_URL = 'https://zenkaritecuitai.ngrok.app';
+        
+        // ==================== STATE ====================
+        let currentModel = 'Hermes 4B';
+        let abortController = null;
+        let conversationHistory = [];
+        let conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
+        let currentConversationId = null;
+        let isGenerating = false;
+
+        // ==================== DOM ELEMENTS ====================
+        const chatContainer = document.getElementById('chat-container');
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('sendBtn');
+        const stopGenBtn = document.getElementById('stopGenBtn');
+        const stopButtonContainer = document.getElementById('stopButtonContainer');
+        const typingPreview = document.getElementById('typingPreview');
+        const currentModelDisplay = document.getElementById('current-model-display');
+        const conversationList = document.getElementById('conversation-list');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const fileInput = document.getElementById('fileInput');
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            createNewConversation();
+            renderConversationList();
+            addWelcomeMessage();
+            loadFromLocalStorage();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('sidebarBtn').addEventListener('click', toggleSidebar);
+            document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
+            document.getElementById('newConversationBtn').addEventListener('click', newConversation);
+
+            document.getElementById('modelBtn').addEventListener('click', toggleModelSelector);
+            document.getElementById('closeModelBtn').addEventListener('click', toggleModelSelector);
+            document.getElementById('modelBackdrop').addEventListener('click', toggleModelSelector);
+            
+            document.querySelectorAll('.model-option').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const model = this.getAttribute('data-model');
+                    selectModel(model);
+                });
+            });
+
+            document.getElementById('menuBtn').addEventListener('click', toggleMenu);
+            document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
+            document.getElementById('menuBackdrop').addEventListener('click', toggleMenu);
+            document.getElementById('exportBtn').addEventListener('click', exportConversation);
+            document.getElementById('clearBtn').addEventListener('click', clearConversation);
+
+            document.getElementById('newChatBtn').addEventListener('click', newConversation);
+            sendBtn.addEventListener('click', sendMessage);
+            stopGenBtn.addEventListener('click', stopGeneration);
+            document.getElementById('attachBtn').addEventListener('click', function() {
+                toggleBottomSheet(true);
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+                updateTypingPreview();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files[0]) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+
+            document.getElementById('sheet-backdrop').addEventListener('click', function() {
+                toggleBottomSheet(false);
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    toggleBottomSheet(false);
+                    toggleModelSelector();
+                    toggleMenu();
+                    closeSidebar();
+                }
+            });
+        }
+
+        // ==================== UI FUNCTIONS ====================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.add('-translate-x-full');
+        }
+
+        function toggleBottomSheet(show) {
+            const sheet = document.getElementById('bottom-sheet');
+            const backdrop = document.getElementById('sheet-backdrop');
+            const content = document.getElementById('sheet-content');
+            if (show) {
+                sheet.classList.remove('pointer-events-none');
+                backdrop.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            } else {
+                sheet.classList.add('pointer-events-none');
+                backdrop.classList.add('opacity-0');
+                content.classList.add('translate-y-full');
+            }
+        }
+
+        function toggleModelSelector() {
+            const modal = document.getElementById('model-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleMenu() {
+            const modal = document.getElementById('menu-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function selectModel(modelName) {
+            currentModel = modelName;
+            currentModelDisplay.textContent = modelName;
+            toggleModelSelector();
+            addSystemMessage('Modèle changé pour <strong>' + modelName + '</strong>');
+            showToast('Modèle ' + modelName + ' activé');
+        }
+
+        function activateFeature(featureName) {
+            toggleBottomSheet(false);
+            input.value = featureName + ': ';
+            input.focus();
+            showToast(featureName + ' activé');
+        }
+
+        function triggerFileUpload(type) {
+            toggleBottomSheet(false);
+            if (type === 'camera') {
+                fileInput.setAttribute('capture', 'environment');
+                fileInput.setAttribute('accept', 'image/*');
+            } else if (type === 'photos') {
+                fileInput.removeAttribute('capture');
+                fileInput.setAttribute('accept', 'image/*');
+            } else {
+                fileInput.removeAttribute('capture');
+                fileInput.setAttribute('accept', '*');
+            }
+            fileInput.click();
+        }
+
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(function() {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // ==================== CONVERSATION MANAGEMENT ====================
+        function createNewConversation() {
+            currentConversationId = 'conv_' + Date.now();
+            const conversation = {
+                id: currentConversationId,
+                title: 'Nouvelle conversation',
+                messages: [],
+                createdAt: new Date().toISOString(),
+                model: currentModel
+            };
+            conversations.unshift(conversation);
+            saveConversations();
+        }
+
+        function newConversation() {
+            saveCurrentConversation();
+            createNewConversation();
+            closeSidebar();
+            chatContainer.innerHTML = '';
+            conversationHistory = [];
+            addWelcomeMessage();
+            saveToLocalStorage();
+            renderConversationList();
+            showToast('Nouvelle conversation créée');
+        }
+
+        function saveCurrentConversation() {
+            const conv = conversations.find(function(c) { return c.id === currentConversationId; });
+            if (conv) {
+                conv.messages = conversationHistory.slice();
+                if (conversationHistory.length > 0) {
+                    const firstMsg = conversationHistory[0].content;
+                    conv.title = firstMsg.substring(0, 30) + (firstMsg.length > 30 ? '...' : '');
+                }
+                saveConversations();
+            }
+        }
+
+        function loadConversation(convId) {
+            saveCurrentConversation();
+            currentConversationId = convId;
+            const conv = conversations.find(function(c) { return c.id === convId; });
+            if (conv) {
+                conversationHistory = conv.messages || [];
+                currentModel = conv.model || 'Hermes 4B';
+                currentModelDisplay.textContent = currentModel;
+                renderConversation();
+            }
+            closeSidebar();
+        }
+
+        function saveConversations() {
+            localStorage.setItem('tecuit_conversations', JSON.stringify(conversations));
+            renderConversationList();
+        }
+
+        function renderConversationList() {
+            conversationList.innerHTML = '';
+            conversations.forEach(function(conv) {
+                const div = document.createElement('div');
+                div.className = 'p-3 rounded-xl cursor-pointer transition-all ' + 
+                    (conv.id === currentConversationId ? 'bg-tecuit-accent/20 border border-tecuit-accent/30' : 'hover:bg-tecuit-dark/50');
+                div.innerHTML = '<div class="font-medium text-sm truncate">' + conv.title + '</div>' +
+                    '<div class="text-xs text-tecuit-subtext mt-1">' + new Date(conv.createdAt).toLocaleDateString('fr-FR') + '</div>';
+                div.addEventListener('click', function() { loadConversation(conv.id); });
+                conversationList.appendChild(div);
+            });
+        }
+
+        function renderConversation() {
+            chatContainer.innerHTML = '';
+            if (conversationHistory.length === 0) {
+                addWelcomeMessage();
+            } else {
+                conversationHistory.forEach(function(msg) {
+                    appendMessage(msg.content, msg.role, false);
+                });
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('tecuit_chat');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    conversationHistory = data.messages || [];
+                } catch (e) {
+                    console.error('Error loading chat history');
+                }
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('tecuit_chat', JSON.stringify({
+                messages: conversationHistory,
+                model: currentModel
+            }));
+        }
+
+        // ==================== MESSAGE FUNCTIONS ====================
+        function addWelcomeMessage() {
+            const html = '<div class="flex flex-col gap-2 ai-msg animate-fade-in">' +
+                '<div class="flex items-center gap-2 mb-1">' +
+                '<img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" class="w-6 h-6 rounded-full">' +
+                '<span class="text-xs font-bold text-tecuit-subtext">Tecuit IA</span>' +
+                '<span class="model-badge">' + currentModel + '</span>' +
+                '</div>' +
+                '<div class="message-bubble">' +
+                'Bonjour ! 👋 Je suis <strong class="gradient-text">Tecuit IA</strong>, votre assistant intelligent.<br><br>' +
+                'Je peux vous aider avec :<br>' +
+                '• Réponses intelligentes avec Hermes 4B/7B<br>' +
+                '• Génération d\'images<br>' +
+                '• Recherche sur Internet<br>' +
+                '• Mémoire de 10GB pour la continuité<br><br>' +
+                '<span class="text-xs bg-tecuit-card border border-tecuit-border px-3 py-1.5 rounded-full text-tecuit-subtext">' +
+                '<i class="fa-solid fa-database mr-1"></i> Mémoire: 10GB active</span>' +
+                '</div></div>';
+            chatContainer.innerHTML = html;
+        }
+
+        function appendMessage(text, sender, save) {
+            if (save === undefined) save = true;
+            const div = document.createElement('div');
+            const isUser = sender === 'user';
+            const msgId = 'msg_' + Date.now();
+            
+            div.className = 'flex flex-col gap-1 ' + (isUser ? 'user-msg self-end' : 'ai-msg') + ' animate-fade-in';
+            
+            let contentHtml = '';
+            
+            if (!isUser) {
+                contentHtml += '<div class="flex items-center gap-2 mb-1">' +
+                    '<img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" class="w-6 h-6 rounded-full">' +
+                    '<span class="text-xs font-bold text-tecuit-subtext">Tecuit IA</span>' +
+                    '<span class="model-badge">' + currentModel + '</span>' +
+                    '</div>';
+            }
+
+            contentHtml += '<div id="' + msgId + '" class="message-bubble ' + (isUser ? '' : '') + '">' + formatMessage(text) + '</div>';
+            
+            if (isUser) {
+                const now = new Date();
+                const time = now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+                contentHtml += '<div class="text-right text-xs text-tecuit-subtext px-1">' + time + '</div>';
+            }
+
+            div.innerHTML = contentHtml;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            if (save) {
+                conversationHistory.push({ role: sender, content: text });
+                saveToLocalStorage();
+                saveCurrentConversation();
+            }
+            
+            return msgId;
+        }
+
+        function formatMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function addSystemMessage(html) {
+            const div = document.createElement('div');
+            div.className = 'flex justify-center my-4 animate-fade-in';
+            div.innerHTML = '<span class="text-xs bg-tecuit-card border border-tecuit-border text-tecuit-subtext px-3 py-1 rounded-full">' + html + '</span>';
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function updateTypingPreview() {
+            const text = input.value.trim();
+            if (text) {
+                const previewText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                typingPreview.textContent = previewText;
+                typingPreview.style.display = 'block';
+            } else {
+                typingPreview.style.display = 'none';
+            }
+        }
+
+        // ==================== SEND MESSAGE (FIXED API) ====================
+        async function sendMessage() {
+            const text = input.value.trim();
+            if (!text || isGenerating) return;
+
+            appendMessage(text, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            typingPreview.style.display = 'none';
+            stopButtonContainer.classList.remove('hidden');
+            isGenerating = true;
+
+            abortController = new AbortController();
+            const signal = abortController.signal;
+
+            try {
+                // Try direct API call without /api/chat prefix
+                const res = await fetch(API_BASE_URL + '/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream'
+                    },
+                    body: JSON.stringify({
+                        model: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
+                        messages: conversationHistory.map(function(m) {
+                            return { role: m.role, content: m.content };
+                        }),
+                        stream: true,
+                        temperature: 0.7,
+                        max_tokens: 2048
+                    }),
+                    signal: signal
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.text();
+                    throw new Error('Erreur serveur: ' + res.status + ' - ' + errorData.substring(0, 100));
+                }
+
+                const messageId = appendMessage('', 'tecuit', false);
+                const tecuitDiv = document.getElementById(messageId);
+                tecuitDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                let fullReply = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.substring(6).trim();
+                            if (dataStr === '[DONE]' || dataStr === '') break;
+                            
+                            try {
+                                const json = JSON.parse(dataStr);
+                                const content = json.choices && json.choices[0] && json.choices[0].delta ? (json.choices[0].delta.content || '') : '';
+                                fullReply += content;
+                                
+                                if (tecuitDiv && fullReply) {
+                                    tecuitDiv.innerHTML = formatMessage(fullReply);
+                                }
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            } catch (e) {
+                                console.log('Parse error:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (fullReply) {
+                    conversationHistory.push({ role: 'tecuit', content: fullReply });
+                    saveToLocalStorage();
+                    saveCurrentConversation();
+                }
+                
+                stopButtonContainer.classList.add('hidden');
+                isGenerating = false;
+
+            } catch (err) {
+                console.error('API Error:', err);
+                if (err.name === 'AbortError') {
+                    const lastAiMsg = chatContainer.querySelectorAll('.ai-msg .message-bubble');
+                    if (lastAiMsg.length > 0) {
+                        lastAiMsg[lastAiMsg.length - 1].innerHTML += '<br><br><em class="text-tecuit-subtext">[Génération arrêtée]</em>';
+                    }
+                } else {
+                    const errorHtml = '<div class="error-message">' +
+                        '<strong>⚠️ Erreur de connexion</strong><br>' +
+                        err.message + '<br><br>' +
+                        '<small>Assurez-vous que le backend est accessible et que CORS est configuré.</small>' +
+                        '</div>';
+                    appendMessage(errorHtml, 'tecuit');
+                }
+                stopButtonContainer.classList.add('hidden');
+                isGenerating = false;
+            }
+        }
+
+        function stopGeneration() {
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+                isGenerating = false;
+                stopButtonContainer.classList.add('hidden');
+                showToast('Génération arrêtée');
+            }
+        }
+
+        // ==================== FILE UPLOAD ====================
+        function handleFileUpload(file) {
+            if (!file) return;
+            
+            const maxSize = 500 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showToast('⚠️ Fichier trop volumineux (max 500 Mo)');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const filename = file.name;
+                const fileSize = (file.size / 1024).toFixed(2);
+                const message = '📎 Fichier envoyé: ' + filename + '\nTaille: ' + fileSize + ' KB';
+                
+                appendMessage(message, 'user');
+                input.value = 'Analyse ce fichier: ' + filename;
+                input.focus();
+                
+                showToast('Fichier chargé avec succès');
+            };
+            reader.readAsText(file);
+        }
+
+        // ==================== CONVERSATION UTILS ====================
+        function clearConversation() {
+            if (!confirm('Voulez-vous vraiment supprimer toute la conversation ?')) return;
+            
+            chatContainer.innerHTML = '';
+            conversationHistory = [];
+            saveToLocalStorage();
+            
+            const conv = conversations.find(function(c) { return c.id === currentConversationId; });
+            if (conv) {
+                conv.messages = [];
+                saveConversations();
+            }
+            
+            addWelcomeMessage();
+            toggleMenu();
+            showToast('Conversation effacée');
+        }
+
+        function exportConversation() {
+            const messages = conversationHistory.map(function(msg) {
+                return {
+                    from: msg.role === 'user' ? 'utilisateur' : 'tecuit',
+                    text: msg.content,
+                    timestamp: new Date().toISOString()
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(messages, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tecuit_chat_' + Date.now() + '.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            toggleMenu();
+            showToast('Conversation exportée');
+        }
+    </script>
+</body>
+</html>
