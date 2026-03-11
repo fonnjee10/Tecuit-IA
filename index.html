@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tecuit IA - Assistant Intelligent</title>
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Fontsource Inter -->
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.min.css" rel="stylesheet">
 <script>
 tailwind.config = {
   theme: {
     extend: {
-      fontFamily: { sans: ['Inter', 'sans-serif'] },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
       colors: {
         tecuit: {
           dark: '#09090b',
@@ -33,56 +38,231 @@ tailwind.config = {
         'float': 'float 3s ease-in-out infinite'
       },
       keyframes: {
-        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-        slideUp: { '0%': { transform: 'translateY(100%)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-        slideDown: { '0%': { transform: 'translateY(-100%)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-        typing: { '0%, 100%': { opacity: '0.3', transform: 'scale(0.8)' }, '50%': { opacity: '1', transform: 'scale(1)' } },
-        pulseGlow: { '0%, 100%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' }, '50%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.6)' } },
-        bounceIn: { '0%': { transform: 'scale(0.3)', opacity: '0' }, '50%': { transform: 'scale(1.05)' }, '70%': { transform: 'scale(0.9)' }, '100%': { transform: 'scale(1)', opacity: '1' } },
-        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        typing: {
+          '0%, 100%': { opacity: '0.3', transform: 'scale(0.8)' },
+          '50%': { opacity: '1', transform: 'scale(1)' }
+        },
+        pulseGlow: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' },
+          '50%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.6)' }
+        },
+        bounceIn: {
+          '0%': { transform: 'scale(0.3)', opacity: '0' },
+          '50%': { transform: 'scale(1.05)' },
+          '70%': { transform: 'scale(0.9)' },
+          '100%': { transform: 'scale(1)', opacity: '1' }
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' }
+        }
       }
     }
   }
-};
+}
 </script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; overflow: hidden; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #09090b; }
 ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
-.message-bubble { max-width: 85%; border-radius: 18px; padding: 12px 16px; line-height: 1.6; font-size: 0.95rem; word-wrap: break-word; white-space: pre-wrap; animation: bounceIn 0.4s ease-out; }
-.user-msg { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
-.ai-msg { background-color: rgba(24, 24, 27, 0.8); color: #e4e4e7; align-self: flex-start; padding-left: 0; border: 1px solid rgba(99, 102, 241, 0.2); }
-.model-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
-.sheet-handle { width: 40px; height: 4px; background-color: #3f3f46; border-radius: 2px; margin: 0 auto 16px auto; transition: background-color 0.3s; }
-.sheet-handle:hover { background-color: #6366f1; }
-.feature-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.feature-item:hover { background-color: rgba(99, 102, 241, 0.1); transform: translateY(-2px); }
-.feature-item:active { transform: scale(0.98); }
-.typing-indicator { display: flex; align-items: center; gap: 4px; padding: 8px 0; }
-.typing-indicator span { display: inline-block; width: 8px; height: 8px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; animation: typing 1.4s infinite; }
+::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+.message-bubble {
+  max-width: 85%;
+  border-radius: 18px;
+  padding: 12px 16px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  animation: bounceIn 0.4s ease-out;
+}
+.user-msg {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+.ai-msg {
+  background-color: rgba(24, 24, 27, 0.8);
+  color: #e4e4e7;
+  align-self: flex-start;
+  padding-left: 0;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+.model-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  animation: pulse 2s infinite;
+}
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background-color: #3f3f46;
+  border-radius: 2px;
+  margin: 0 auto 16px auto;
+  transition: background-color 0.3s;
+}
+.sheet-handle:hover {
+  background-color: #6366f1;
+}
+.feature-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.feature-item:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+  transform: translateY(-2px);
+}
+.feature-item:active {
+  transform: scale(0.98);
+}
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
 .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
 .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-.gradient-text { background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; background-size: 200% 200%; animation: gradientShift 3s ease infinite; }
-@keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-.glow-effect { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); animation: pulseGlow 2s infinite; }
-.error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 12px; margin: 8px 0; animation: shake 0.5s ease-in-out; }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-.toast-enter { animation: slideDown 0.4s ease-out forwards; }
-.toast-exit { animation: slideUp 0.4s ease-out forwards; }
-.modal-enter { animation: fadeIn 0.3s ease-out forwards; }
-.send-btn-active { background: linear-gradient(135deg, #6366f1, #4f46e5); transform: scale(1.05); box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5); }
-.send-btn-inactive { background: #27272a; opacity: 0.5; }
-.chat-scroll { scroll-behavior: smooth; }
-.message-enter { animation: messageEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-@keyframes messageEnter { 0% { opacity: 0; transform: translateY(20px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-.code-block { background: #0d0d0f; border: 1px solid #27272a; border-radius: 8px; padding: 12px; margin: 8px 0; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; }
-.welcome-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 20px; padding: 24px; animation: float 3s ease-in-out infinite; }
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.glow-effect {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  animation: pulseGlow 2s infinite;
+}
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  animation: shake 0.5s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+.toast-enter {
+  animation: slideDown 0.4s ease-out forwards;
+}
+.toast-exit {
+  animation: slideUp 0.4s ease-out forwards;
+}
+.modal-enter {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+.modal-exit {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.send-btn-active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+}
+.send-btn-inactive {
+  background: #27272a;
+  opacity: 0.5;
+}
+.chat-scroll {
+  scroll-behavior: smooth;
+}
+.message-enter {
+  animation: messageEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes messageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.loading-ring {
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.code-block {
+  background: #0d0d0f;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+.welcome-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  animation: float 3s ease-in-out infinite;
+}
 </style>
 </head>
 <body class="h-screen flex flex-col">
-
+<!-- Header -->
 <header class="flex items-center justify-between px-4 py-3 bg-tecuit-dark/95 backdrop-blur-md border-b border-tecuit-border z-30 flex-shrink-0 animate-slide-down">
   <div class="flex items-center gap-3">
     <button id="sidebarBtn" class="text-tecuit-subtext hover:text-white transition-all duration-300 p-2 hover:bg-tecuit-border/30 rounded-xl active:scale-95">
@@ -107,6 +287,7 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
   </div>
 </header>
 
+<!-- Sidebar -->
 <div id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-tecuit-card border-r border-tecuit-border transform -translate-x-full transition-transform duration-300 z-40">
   <div class="p-4 h-full flex flex-col">
     <div class="flex items-center justify-between mb-6">
@@ -120,8 +301,12 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
       <span>Nouvelle conversation</span>
     </button>
     <div class="flex-1 overflow-y-auto">
-      <div class="text-xs text-tecuit-subtext mb-2 flex items-center gap-2"><i class="fa-regular fa-clock"></i> Aujourd'hui</div>
-      <div id="conversation-list" class="space-y-2"></div>
+      <div class="text-xs text-tecuit-subtext mb-2 flex items-center gap-2">
+        <i class="fa-regular fa-clock"></i>
+        Aujourd'hui
+      </div>
+      <div id="conversation-list" class="space-y-2">
+      </div>
     </div>
     <div class="pt-4 border-t border-tecuit-border">
       <div class="flex items-center gap-3 p-3 rounded-xl bg-tecuit-dark/50 hover:bg-tecuit-dark transition-all duration-300">
@@ -137,8 +322,11 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
   </div>
 </div>
 
-<main id="chat-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 chat-scroll"></main>
+<!-- Chat Area -->
+<main id="chat-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 chat-scroll">
+</main>
 
+<!-- Input Area -->
 <div class="p-4 bg-tecuit-dark border-t border-tecuit-border z-30 flex-shrink-0 animate-slide-up">
   <div id="typingPreview" class="hidden mb-2 px-2 text-xs text-tecuit-subtext italic truncate animate-fade-in"></div>
   <div id="stopButtonContainer" class="hidden mb-2 flex justify-center animate-fade-in">
@@ -161,8 +349,10 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
   </div>
 </div>
 
+<!-- Hidden File Input -->
 <input type="file" id="fileInput" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt">
 
+<!-- Bottom Sheet (Features Menu) -->
 <div id="bottom-sheet" class="fixed inset-0 z-50 pointer-events-none">
   <div id="sheet-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
   <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-tecuit-card border-t border-tecuit-border rounded-t-3xl transform translate-y-full transition-transform duration-300 pointer-events-auto max-h-[85vh] flex flex-col">
@@ -170,44 +360,75 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
       <div class="sheet-handle"></div>
       <h3 class="text-center font-semibold text-lg mb-4">Options Tecuit</h3>
       <div class="grid grid-cols-3 gap-3 mb-6">
-        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('camera')">
-          <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-solid fa-camera text-xl"></i></div>
+        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" data-action="camera">
+          <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+            <i class="fa-solid fa-camera text-xl"></i>
+          </div>
           <span class="text-xs font-medium">Caméra</span>
         </button>
-        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('photos')">
-          <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-regular fa-image text-xl"></i></div>
+        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" data-action="photos">
+          <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+            <i class="fa-regular fa-image text-xl"></i>
+          </div>
           <span class="text-xs font-medium">Photos</span>
         </button>
-        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('files')">
-          <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-solid fa-paperclip text-xl"></i></div>
+        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" data-action="files">
+          <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+            <i class="fa-solid fa-paperclip text-xl"></i>
+          </div>
           <span class="text-xs font-medium">Fichiers</span>
         </button>
       </div>
       <div class="h-px bg-tecuit-border w-full mb-4"></div>
       <div class="flex flex-col gap-1 pb-6">
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Créer une image')">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20"><i class="fa-solid fa-wand-magic-sparkles text-lg"></i></div>
-          <div class="text-left flex-1"><h4 class="font-medium text-sm">Créer une image</h4><p class="text-xs text-tecuit-subtext">Visualisez n'importe quoi</p></div>
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Créer une image">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20">
+            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+          </div>
+          <div class="text-left flex-1">
+            <h4 class="font-medium text-sm">Créer une image</h4>
+            <p class="text-xs text-tecuit-subtext">Visualisez n'importe quoi</p>
+          </div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Raisonnement avancé')">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-amber-400 border border-amber-500/20"><i class="fa-regular fa-lightbulb text-lg"></i></div>
-          <div class="text-left flex-1"><h4 class="font-medium text-sm">Raisonnement avancé</h4><p class="text-xs text-tecuit-subtext">Réfléchir plus longtemps</p></div>
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Raisonnement avancé">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-amber-400 border border-amber-500/20">
+            <i class="fa-regular fa-lightbulb text-lg"></i>
+          </div>
+          <div class="text-left flex-1">
+            <h4 class="font-medium text-sm">Raisonnement avancé</h4>
+            <p class="text-xs text-tecuit-subtext">Réfléchir plus longtemps</p>
+          </div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche approfondie')">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20"><i class="fa-solid fa-magnifying-glass-chart text-lg"></i></div>
-          <div class="text-left flex-1"><h4 class="font-medium text-sm">Recherche approfondie</h4><p class="text-xs text-tecuit-subtext">Rapports détaillés</p></div>
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Recherche approfondie">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
+            <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
+          </div>
+          <div class="text-left flex-1">
+            <h4 class="font-medium text-sm">Recherche approfondie</h4>
+            <p class="text-xs text-tecuit-subtext">Rapports détaillés</p>
+          </div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche sur Internet')">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20"><i class="fa-solid fa-globe text-lg"></i></div>
-          <div class="text-left flex-1"><h4 class="font-medium text-sm">Recherche sur Internet</h4><p class="text-xs text-tecuit-subtext">Infos en temps réel</p></div>
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Recherche sur Internet">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+            <i class="fa-solid fa-globe text-lg"></i>
+          </div>
+          <div class="text-left flex-1">
+            <h4 class="font-medium text-sm">Recherche sur Internet</h4>
+            <p class="text-xs text-tecuit-subtext">Infos en temps réel</p>
+          </div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
-        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Étudier et apprendre')">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20"><i class="fa-solid fa-book-open text-lg"></i></div>
-          <div class="text-left flex-1"><h4 class="font-medium text-sm">Étudier et apprendre</h4><p class="text-xs text-tecuit-subtext">Nouveaux concepts</p></div>
+        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" data-feature="Étudier et apprendre">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+            <i class="fa-solid fa-book-open text-lg"></i>
+          </div>
+          <div class="text-left flex-1">
+            <h4 class="font-medium text-sm">Étudier et apprendre</h4>
+            <p class="text-xs text-tecuit-subtext">Nouveaux concepts</p>
+          </div>
           <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
         </button>
       </div>
@@ -215,50 +436,77 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
   </div>
 </div>
 
+<!-- Model Selector Modal -->
 <div id="model-modal" class="fixed inset-0 z-50 hidden">
   <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modelBackdrop"></div>
   <div class="absolute inset-0 flex items-center justify-center p-4">
     <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl modal-enter">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-bold">Sélectionner le modèle</h3>
-        <button id="closeModelBtn" class="text-tecuit-subtext hover:text-white transition-colors p-2 hover:bg-tecuit-border/30 rounded-xl"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <button id="closeModelBtn" class="text-tecuit-subtext hover:text-white transition-colors p-2 hover:bg-tecuit-border/30 rounded-xl">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
       </div>
       <p class="text-sm text-tecuit-subtext mb-6">Choisissez l'IA adaptée à vos besoins.</p>
       <div class="space-y-3">
         <button class="model-option w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all duration-300 active:scale-98" data-model="Hermes 4B">
-          <div class="flex justify-between items-center mb-2"><span class="font-semibold text-white">Hermes 4B</span><span class="text-xs bg-tecuit-border px-2 py-1 rounded text-tecuit-subtext">Rapide</span></div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-semibold text-white">Hermes 4B</span>
+            <span class="text-xs bg-tecuit-border px-2 py-1 rounded text-tecuit-subtext">Rapide</span>
+          </div>
           <p class="text-xs text-tecuit-subtext">Idéal pour les tâches quotidiennes et la rapidité.</p>
         </button>
         <button class="model-option w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all duration-300 active:scale-98" data-model="Hermes 7B">
-          <div class="flex justify-between items-center mb-2"><span class="font-semibold text-white">Hermes 7B</span><span class="text-xs bg-indigo-900/50 text-indigo-300 px-2 py-1 rounded border border-indigo-500/30">Puissant</span></div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-semibold text-white">Hermes 7B</span>
+            <span class="text-xs bg-indigo-900/50 text-indigo-300 px-2 py-1 rounded border border-indigo-500/30">Puissant</span>
+          </div>
           <p class="text-xs text-tecuit-subtext">Meilleur pour le raisonnement complexe et le code.</p>
         </button>
       </div>
       <div class="mt-6 pt-4 border-t border-tecuit-border">
-        <div class="flex items-center justify-between text-xs text-tecuit-subtext mb-2"><span>Mémoire utilisateur</span><span>3.5GB / 10GB</span></div>
-        <div class="w-full h-2 bg-tecuit-border rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-tecuit-accent to-purple-500 w-[35%] animate-pulse"></div></div>
+        <div class="flex items-center justify-between text-xs text-tecuit-subtext mb-2">
+          <span>Mémoire utilisateur</span>
+          <span>3.5GB / 10GB</span>
+        </div>
+        <div class="w-full h-2 bg-tecuit-border rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-tecuit-accent to-purple-500 w-[35%] animate-pulse"></div>
+        </div>
         <p class="text-[10px] text-tecuit-subtext mt-2">10GB de stockage pour la continuité des conversations</p>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Menu Modal -->
 <div id="menu-modal" class="fixed inset-0 z-50 hidden">
   <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="menuBackdrop"></div>
   <div class="absolute inset-0 flex items-center justify-center p-4">
     <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl modal-enter">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-bold">Options</h3>
-        <button id="closeMenuBtn" class="text-tecuit-subtext hover:text-white transition-colors p-2 hover:bg-tecuit-border/30 rounded-xl"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <button id="closeMenuBtn" class="text-tecuit-subtext hover:text-white transition-colors p-2 hover:bg-tecuit-border/30 rounded-xl">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
       </div>
       <div class="space-y-2">
         <button id="exportBtn" class="w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all duration-300 active:scale-98 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent"><i class="fa-solid fa-download"></i></div>
-          <div><div class="font-medium text-sm">Exporter la conversation</div><div class="text-xs text-tecuit-subtext">Télécharger en JSON</div></div>
+          <div class="w-10 h-10 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
+            <i class="fa-solid fa-download"></i>
+          </div>
+          <div>
+            <div class="font-medium text-sm">Exporter la conversation</div>
+            <div class="text-xs text-tecuit-subtext">Télécharger en JSON</div>
+          </div>
         </button>
         <button id="clearBtn" class="w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-red-500/50 transition-all duration-300 active:scale-98 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><i class="fa-solid fa-trash"></i></div>
-          <div><div class="font-medium text-sm">Effacer la conversation</div><div class="text-xs text-tecuit-subtext">Supprimer l'historique</div></div>
+          <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400">
+            <i class="fa-solid fa-trash"></i>
+          </div>
+          <div>
+            <div class="font-medium text-sm">Effacer la conversation</div>
+            <div class="text-xs text-tecuit-subtext">Supprimer l'historique</div>
+          </div>
         </button>
       </div>
       <div class="mt-6 pt-4 border-t border-tecuit-border text-center">
@@ -269,6 +517,7 @@ body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -w
   </div>
 </div>
 
+<!-- Toast Notification -->
 <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-tecuit-card border border-tecuit-border px-6 py-3 rounded-full shadow-xl z-50 transition-all duration-300 opacity-0 pointer-events-none">
   <div class="flex items-center gap-2">
     <i class="fa-solid fa-circle-info text-tecuit-accent animate-pulse"></i>
@@ -285,7 +534,7 @@ const LOGO_URL = 'https://image.qwenlm.ai/public_source/13d5dabe-33b4-49b1-9ab0-
 let currentModel = 'Hermes 4B';
 let abortController = null;
 let conversationHistory = [];
-let conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
+let conversations = [];
 let currentConversationId = null;
 let isGenerating = false;
 let currentResponseContent = '';
@@ -294,19 +543,11 @@ let currentMessageElement = null;
 // ==================== DOM ELEMENTS ====================
 let chatContainer, input, sendBtn, stopGenBtn, stopButtonContainer, typingPreview;
 let currentModelDisplay, conversationList, toast, toastMessage, fileInput;
+let sidebar, modelModal, menuModal, bottomSheet;
 
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', function() {
-  initDOMElements();
-  setupEventListeners();
-  initializeConversation();
-  renderConversationList();
-  addWelcomeMessage();
-  loadFromLocalStorage();
-  updateSendButtonState();
-});
-
-function initDOMElements() {
+  // Get all DOM elements
   chatContainer = document.getElementById('chat-container');
   input = document.getElementById('chat-input');
   sendBtn = document.getElementById('sendBtn');
@@ -318,7 +559,38 @@ function initDOMElements() {
   toast = document.getElementById('toast');
   toastMessage = document.getElementById('toast-message');
   fileInput = document.getElementById('fileInput');
-}
+  sidebar = document.getElementById('sidebar');
+  modelModal = document.getElementById('model-modal');
+  menuModal = document.getElementById('menu-modal');
+  bottomSheet = document.getElementById('bottom-sheet');
+  
+  // Load conversations from localStorage
+  try {
+    conversations = JSON.parse(localStorage.getItem('tecuit_conversations') || '[]');
+  } catch (e) {
+    conversations = [];
+  }
+  
+  // Setup all event listeners
+  setupEventListeners();
+  
+  // Initialize conversation
+  initializeConversation();
+  
+  // Render conversation list
+  renderConversationList();
+  
+  // Add welcome message
+  addWelcomeMessage();
+  
+  // Load chat history from localStorage
+  loadFromLocalStorage();
+  
+  // Update send button state
+  updateSendButtonState();
+  
+  console.log('Tecuit IA initialized successfully');
+});
 
 function initializeConversation() {
   if (conversations.length === 0) {
@@ -331,16 +603,27 @@ function initializeConversation() {
 }
 
 function setupEventListeners() {
-  // Sidebar
-  document.getElementById('sidebarBtn').addEventListener('click', toggleSidebar);
-  document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
-  document.getElementById('newConversationBtn').addEventListener('click', newConversation);
+  // Sidebar buttons
+  const sidebarBtn = document.getElementById('sidebarBtn');
+  const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+  if (sidebarBtn) sidebarBtn.addEventListener('click', toggleSidebar);
+  if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
   
-  // Model Selector
-  document.getElementById('modelBtn').addEventListener('click', toggleModelSelector);
-  document.getElementById('closeModelBtn').addEventListener('click', toggleModelSelector);
-  document.getElementById('modelBackdrop').addEventListener('click', toggleModelSelector);
+  // New conversation buttons
+  const newConversationBtn = document.getElementById('newConversationBtn');
+  const newChatBtn = document.getElementById('newChatBtn');
+  if (newConversationBtn) newConversationBtn.addEventListener('click', newConversation);
+  if (newChatBtn) newChatBtn.addEventListener('click', newConversation);
   
+  // Model selector
+  const modelBtn = document.getElementById('modelBtn');
+  const closeModelBtn = document.getElementById('closeModelBtn');
+  const modelBackdrop = document.getElementById('modelBackdrop');
+  if (modelBtn) modelBtn.addEventListener('click', toggleModelSelector);
+  if (closeModelBtn) closeModelBtn.addEventListener('click', toggleModelSelector);
+  if (modelBackdrop) modelBackdrop.addEventListener('click', toggleModelSelector);
+  
+  // Model options
   document.querySelectorAll('.model-option').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const model = this.getAttribute('data-model');
@@ -348,100 +631,143 @@ function setupEventListeners() {
     });
   });
   
-  // Menu
-  document.getElementById('menuBtn').addEventListener('click', toggleMenu);
-  document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
-  document.getElementById('menuBackdrop').addEventListener('click', toggleMenu);
-  document.getElementById('exportBtn').addEventListener('click', exportConversation);
-  document.getElementById('clearBtn').addEventListener('click', clearConversation);
-  document.getElementById('newChatBtn').addEventListener('click', newConversation);
+  // Menu buttons
+  const menuBtn = document.getElementById('menuBtn');
+  const closeMenuBtn = document.getElementById('closeMenuBtn');
+  const menuBackdrop = document.getElementById('menuBackdrop');
+  if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+  if (closeMenuBtn) closeMenuBtn.addEventListener('click', toggleMenu);
+  if (menuBackdrop) menuBackdrop.addEventListener('click', toggleMenu);
   
-  // Chat
-  sendBtn.addEventListener('click', sendMessage);
-  stopGenBtn.addEventListener('click', stopGeneration);
+  // Menu actions
+  const exportBtn = document.getElementById('exportBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  if (exportBtn) exportBtn.addEventListener('click', exportConversation);
+  if (clearBtn) clearBtn.addEventListener('click', clearConversation);
   
-  document.getElementById('attachBtn').addEventListener('click', function() {
+  // Send message
+  if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+  if (stopGenBtn) stopGenBtn.addEventListener('click', stopGeneration);
+  
+  // Attach button (bottom sheet)
+  const attachBtn = document.getElementById('attachBtn');
+  if (attachBtn) attachBtn.addEventListener('click', function() {
     toggleBottomSheet(true);
   });
   
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-  
-  input.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 128) + 'px';
-    updateTypingPreview();
-    updateSendButtonState();
-  });
-  
-  fileInput.addEventListener('change', function(e) {
-    if (e.target.files && e.target.files[0]) {
-      handleFileUpload(e.target.files[0]);
-    }
-  });
-  
-  document.getElementById('sheet-backdrop').addEventListener('click', function() {
+  // Bottom sheet backdrop
+  const sheetBackdrop = document.getElementById('sheet-backdrop');
+  if (sheetBackdrop) sheetBackdrop.addEventListener('click', function() {
     toggleBottomSheet(false);
   });
   
+  // Bottom sheet feature buttons
+  document.querySelectorAll('[data-action]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const action = this.getAttribute('data-action');
+      toggleBottomSheet(false);
+      triggerFileUpload(action);
+    });
+  });
+  
+  document.querySelectorAll('[data-feature]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const feature = this.getAttribute('data-feature');
+      toggleBottomSheet(false);
+      activateFeature(feature);
+    });
+  });
+  
+  // Input events
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+    
+    input.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+      updateTypingPreview();
+      updateSendButtonState();
+    });
+  }
+  
+  // File input
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+  }
+  
+  // Escape key to close modals
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       toggleBottomSheet(false);
-      toggleModelSelector();
-      toggleMenu();
-      closeSidebar();
+      if (!modelModal.classList.contains('hidden')) toggleModelSelector();
+      if (!menuModal.classList.contains('hidden')) toggleMenu();
+      if (!sidebar.classList.contains('-translate-x-full')) toggleSidebar();
     }
   });
+  
+  console.log('Event listeners setup complete');
 }
 
 // ==================== UI FUNCTIONS ====================
 function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle('-translate-x-full');
+  if (sidebar) {
+    sidebar.classList.toggle('-translate-x-full');
+  }
 }
 
 function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.classList.add('-translate-x-full');
+  if (sidebar) {
+    sidebar.classList.add('-translate-x-full');
+  }
 }
 
 function toggleBottomSheet(show) {
-  const sheet = document.getElementById('bottom-sheet');
+  if (!bottomSheet) return;
   const backdrop = document.getElementById('sheet-backdrop');
   const content = document.getElementById('sheet-content');
   
   if (show) {
-    sheet.classList.remove('pointer-events-none');
-    backdrop.classList.remove('opacity-0');
-    content.classList.remove('translate-y-full');
+    bottomSheet.classList.remove('pointer-events-none');
+    if (backdrop) backdrop.classList.remove('opacity-0');
+    if (content) content.classList.remove('translate-y-full');
   } else {
-    sheet.classList.add('pointer-events-none');
-    backdrop.classList.add('opacity-0');
-    content.classList.add('translate-y-full');
+    bottomSheet.classList.add('pointer-events-none');
+    if (backdrop) backdrop.classList.add('opacity-0');
+    if (content) content.classList.add('translate-y-full');
   }
 }
 
 function toggleModelSelector() {
-  const modal = document.getElementById('model-modal');
-  modal.classList.toggle('hidden');
+  if (modelModal) {
+    modelModal.classList.toggle('hidden');
+  }
 }
 
 function toggleMenu() {
-  const modal = document.getElementById('menu-modal');
-  modal.classList.toggle('hidden');
+  if (menuModal) {
+    menuModal.classList.toggle('hidden');
+  }
 }
 
 function selectModel(modelName) {
   currentModel = modelName;
-  currentModelDisplay.textContent = modelName;
+  if (currentModelDisplay) {
+    currentModelDisplay.textContent = modelName;
+  }
   toggleModelSelector();
   addSystemMessage('Modèle changé pour <strong>' + modelName + '</strong>');
   showToast('Modèle ' + modelName + ' activé');
   
+  // Save model to current conversation
   const conv = conversations.find(function(c) { return c.id === currentConversationId; });
   if (conv) {
     conv.model = modelName;
@@ -450,15 +776,17 @@ function selectModel(modelName) {
 }
 
 function activateFeature(featureName) {
-  toggleBottomSheet(false);
-  input.value = featureName + ': ';
-  input.focus();
-  updateSendButtonState();
+  if (input) {
+    input.value = featureName + ': ';
+    input.focus();
+    updateSendButtonState();
+  }
   showToast(featureName + ' activé');
 }
 
 function triggerFileUpload(type) {
-  toggleBottomSheet(false);
+  if (!fileInput) return;
+  
   if (type === 'camera') {
     fileInput.setAttribute('capture', 'environment');
     fileInput.setAttribute('accept', 'image/*');
@@ -473,6 +801,8 @@ function triggerFileUpload(type) {
 }
 
 function showToast(message) {
+  if (!toast || !toastMessage) return;
+  
   toastMessage.textContent = message;
   toast.classList.remove('opacity-0', 'pointer-events-none');
   toast.classList.add('toast-enter');
@@ -488,6 +818,8 @@ function showToast(message) {
 }
 
 function updateSendButtonState() {
+  if (!sendBtn || !input) return;
+  
   const hasText = input.value.trim().length > 0;
   if (hasText && !isGenerating) {
     sendBtn.disabled = false;
@@ -518,7 +850,7 @@ function newConversation() {
   saveCurrentConversation();
   createNewConversation();
   closeSidebar();
-  chatContainer.innerHTML = '';
+  if (chatContainer) chatContainer.innerHTML = '';
   conversationHistory = [];
   currentResponseContent = '';
   currentMessageElement = null;
@@ -548,7 +880,9 @@ function loadConversation(convId) {
   if (conv) {
     conversationHistory = conv.messages || [];
     currentModel = conv.model || 'Hermes 4B';
-    currentModelDisplay.textContent = currentModel;
+    if (currentModelDisplay) {
+      currentModelDisplay.textContent = currentModel;
+    }
     currentResponseContent = '';
     currentMessageElement = null;
     renderConversation();
@@ -557,11 +891,17 @@ function loadConversation(convId) {
 }
 
 function saveConversations() {
-  localStorage.setItem('tecuit_conversations', JSON.stringify(conversations));
-  renderConversationList();
+  try {
+    localStorage.setItem('tecuit_conversations', JSON.stringify(conversations));
+    renderConversationList();
+  } catch (e) {
+    console.error('Error saving conversations:', e);
+  }
 }
 
 function renderConversationList() {
+  if (!conversationList) return;
+  
   conversationList.innerHTML = '';
   conversations.forEach(function(conv) {
     const div = document.createElement('div');
@@ -576,6 +916,8 @@ function renderConversationList() {
 }
 
 function renderConversation() {
+  if (!chatContainer) return;
+  
   chatContainer.innerHTML = '';
   if (conversationHistory.length === 0) {
     addWelcomeMessage();
@@ -588,30 +930,38 @@ function renderConversation() {
 }
 
 function loadFromLocalStorage() {
-  const saved = localStorage.getItem('tecuit_chat');
-  if (saved) {
-    try {
+  try {
+    const saved = localStorage.getItem('tecuit_chat');
+    if (saved) {
       const data = JSON.parse(saved);
       conversationHistory = data.messages || [];
       if (data.model) {
         currentModel = data.model;
-        currentModelDisplay.textContent = currentModel;
+        if (currentModelDisplay) {
+          currentModelDisplay.textContent = currentModel;
+        }
       }
-    } catch (e) {
-      console.error('Error loading chat history:', e);
     }
+  } catch (e) {
+    console.error('Error loading chat history:', e);
   }
 }
 
 function saveToLocalStorage() {
-  localStorage.setItem('tecuit_chat', JSON.stringify({
-    messages: conversationHistory,
-    model: currentModel
-  }));
+  try {
+    localStorage.setItem('tecuit_chat', JSON.stringify({
+      messages: conversationHistory,
+      model: currentModel
+    }));
+  } catch (e) {
+    console.error('Error saving chat history:', e);
+  }
 }
 
 // ==================== MESSAGE FUNCTIONS ====================
 function addWelcomeMessage() {
+  if (!chatContainer) return;
+  
   const html = '<div class="welcome-card animate-fade-in max-w-lg mx-auto">' +
     '<div class="flex flex-col items-center text-center gap-4">' +
     '<img src="' + LOGO_URL + '" class="w-16 h-16 rounded-full animate-float">' +
@@ -637,7 +987,8 @@ function addWelcomeMessage() {
     '<p class="text-xs text-tecuit-subtext">10GB Mémoire</p>' +
     '</div>' +
     '</div>' +
-    '</div></div>';
+    '</div>' +
+    '</div>';
   
   const div = document.createElement('div');
   div.className = 'flex justify-center w-full';
@@ -647,6 +998,7 @@ function addWelcomeMessage() {
 
 function appendMessage(text, sender, save) {
   if (save === undefined) save = true;
+  if (!chatContainer) return null;
   
   const div = document.createElement('div');
   const isUser = sender === 'user';
