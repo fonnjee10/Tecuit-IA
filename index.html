@@ -815,7 +815,6 @@
                     },
                     body: JSON.stringify({
                         model: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
-                      
                         messages: conversationHistory.map(function(m) {
                             return { role: m.role, content: m.content };
                         }),
@@ -848,7 +847,7 @@
                     
                     for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
-                        if (line.startsWith('data: ')) {
+                        if (line.startsWith(' ')) {
                             const dataStr = line.substring(6).trim();
                             if (dataStr === '[DONE]' || dataStr === '') break;
                             
@@ -974,7 +973,4 @@
     </script>
 </body>
 </html>
-
-
-
 
