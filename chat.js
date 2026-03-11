@@ -6,7 +6,7 @@ const ModelManager = {
     models: {
         'Hermes 4B': {
             name: 'Hermes 4B',
-            apiModel: 'izhanjafry/nous-hermes-2-mistral-7b-dpo',
+            apiModel: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
             description: 'Rapide et efficace pour les tâches quotidiennes',
             temperature: 0.7,
             maxTokens: 2048,
@@ -284,4 +284,5 @@ TecuitChat.sendMessage('Bonjour', {
 });
 
 */
+
 
