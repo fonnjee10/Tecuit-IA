@@ -282,7 +282,4 @@ TecuitChat.init({
 TecuitChat.sendMessage('Bonjour', {
     model: 'Hermes 7B'
 });
-
 */
-
-
