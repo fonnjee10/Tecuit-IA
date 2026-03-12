@@ -648,7 +648,7 @@
             const conv = conversations.find(function(c) { return c.id === convId; });
             if (conv) {
                 conversationHistory = conv.messages || [];
-                currentModel = conv.model || 'Hermes 4B';
+                currentModel = conv.model || 'Hermes 7B';
                 currentModelDisplay.textContent = currentModel;
                 renderConversation();
             }
@@ -816,7 +816,18 @@
                     body: JSON.stringify({
                         model: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
                         messages: conversationHistory.map(function(m) {
-                            return { role: m.role, content: m.content };
+
+                                let role = m.role;
+
+               // conversion pour LM Studio
+                             if (role === "tecuit") role = "assistant";
+
+                              return {
+                            role: role,
+                            content: m.content
+                        };
+
+                       })
                         }),
                         stream: true,
                         temperature: 0.7,
@@ -973,3 +984,4 @@
     </script>
 </body>
 </html>
+
