@@ -18,7 +18,7 @@ const ModelManager = {
             apiModel: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
             description: 'Puissant pour le raisonnement complexe et le code',
             temperature: 0.5,
-            maxTokens: 4096,
+            maxTokens: 32000,
             speed: 'Normal',
             power: 'Élevé'
         }
@@ -283,3 +283,4 @@ TecuitChat.sendMessage('Bonjour', {
     model: 'Hermes 7B'
 });
 */
+
