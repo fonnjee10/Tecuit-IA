@@ -816,8 +816,8 @@
                     body: JSON.stringify({
                         model: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
                         messages: conversationHistory.map(function(m) {
-                            role: m.role === "tecuit" ? "assistant" : m.role,
-                            content: m.content
+                            role: m.role content: m.content,
+                            
                         }))
                         };
 
@@ -978,5 +978,6 @@
     </script>
 </body>
 </html>
+
 
 
