@@ -49,7 +49,8 @@
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'bounce-slow': 'bounce 2s infinite',
                         'scale-in': 'scaleIn 0.2s ease-out',
-                        'rotate': 'rotate 1s linear infinite'
+                        'rotate': 'rotate 1s linear infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate'
                     },
                     keyframes: {
                         fadeIn: {
@@ -87,6 +88,10 @@
                         rotate: {
                             '0%': { transform: 'rotate(0deg)' },
                             '100%': { transform: 'rotate(360deg)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(99, 102, 241, 0.5)' },
+                            '100%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(168, 85, 247, 0.6)' }
                         }
                     }
                 }
@@ -343,6 +348,25 @@
         .pulse-active {
             animation: pulse-slow 2s infinite;
         }
+
+        /* BETA Badge */
+        .beta-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: glow 2s ease-in-out infinite alternate;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .beta-badge i {
+            font-size: 0.6rem;
+        }
     </style>
 </head>
 <body class="h-screen overflow-hidden">
@@ -354,8 +378,16 @@
         <!-- Login Form -->
         <div id="login-form" class="auth-card rounded-2xl p-8 w-full max-w-md relative z-10 animate-fade-in-up">
             <div class="text-center mb-8">
-                <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-tecuit-accent/30 animate-pulse-slow">
-                <h1 class="text-2xl font-bold mb-2"><span class="gradient-text">Tecuit IA</span></h1>
+                <div class="relative inline-block">
+                    <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-tecuit-accent/30 animate-pulse-slow">
+                    <div class="absolute -top-1 -right-1">
+                        <span class="beta-badge"><i class="fa-solid fa-flask"></i> BETA</span>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+                    <span class="gradient-text">Tecuit IA</span>
+                    <span class="beta-badge"><i class="fa-solid fa-flask"></i> BETA</span>
+                </h1>
                 <p class="text-tecuit-subtext text-sm" data-i18n="login_subtitle">Connectez-vous pour accéder à vos conversations</p>
             </div>
 
@@ -389,14 +421,25 @@
                 <p class="text-[10px] text-tecuit-subtext">
                     <i class="fa-solid fa-lock mr-1"></i> <span data-i18n="encryption_note">Vos données sont cryptées en AES-256</span>
                 </p>
+                <p class="text-[10px] text-amber-500/80 mt-1">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Version BETA - Des bugs peuvent survenir
+                </p>
             </div>
         </div>
 
         <!-- Register Form -->
         <div id="register-form" class="auth-card rounded-2xl p-8 w-full max-w-md relative z-10 hidden animate-fade-in-up">
             <div class="text-center mb-8">
-                <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-tecuit-accent/30 animate-pulse-slow">
-                <h1 class="text-2xl font-bold mb-2" data-i18n="create_account">Créer un compte</h1>
+                <div class="relative inline-block">
+                    <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-tecuit-accent/30 animate-pulse-slow">
+                    <div class="absolute -top-1 -right-1">
+                        <span class="beta-badge"><i class="fa-solid fa-flask"></i> BETA</span>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+                    <span class="gradient-text">Tecuit IA</span>
+                    <span class="beta-badge"><i class="fa-solid fa-flask"></i> BETA</span>
+                </h1>
                 <p class="text-tecuit-subtext text-sm" data-i18n="register_subtitle">Rejoignez Tecuit IA gratuitement</p>
             </div>
 
@@ -451,8 +494,16 @@
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
                 <div class="flex items-center gap-2">
-                    <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-8 h-8 rounded-full object-cover border border-tecuit-accent/30 animate-pulse-slow">
-                    <h1 class="font-semibold text-lg tracking-tight">Tecuit</h1>
+                    <div class="relative">
+                        <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-8 h-8 rounded-full object-cover border border-tecuit-accent/30 animate-pulse-slow">
+                        <div class="absolute -top-1 -right-1 scale-75">
+                            <span class="beta-badge"><i class="fa-solid fa-flask"></i></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <h1 class="font-semibold text-lg tracking-tight">Tecuit</h1>
+                        <span class="beta-badge text-[10px] px-2 py-0.5"><i class="fa-solid fa-flask"></i> BETA</span>
+                    </div>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -484,7 +535,10 @@
         <div id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-tecuit-card border-r border-tecuit-border transform -translate-x-full transition-transform duration-300 z-40">
             <div class="p-4 h-full flex flex-col">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-semibold text-lg" data-i18n="conversations">Conversations</h2>
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-semibold text-lg" data-i18n="conversations">Conversations</h2>
+                        <span class="beta-badge text-[9px] px-1.5 py-0.5"><i class="fa-solid fa-flask"></i></span>
+                    </div>
                     <button id="closeSidebarBtn" class="text-tecuit-subtext hover:text-white transition-colors btn-animate">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
@@ -561,6 +615,9 @@
             </div>
             <div class="text-center mt-2">
                 <p class="text-[10px] text-tecuit-subtext" data-i18n="disclaimer">Tecuit IA peut faire des erreurs. Vérifiez les informations importantes.</p>
+                <p class="text-[9px] text-amber-500/60 mt-0.5">
+                    <i class="fa-solid fa-flask mr-1"></i> Version BETA v2.1.0
+                </p>
             </div>
         </div>
 
@@ -573,7 +630,10 @@
             <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-tecuit-card border-t border-tecuit-border rounded-t-3xl transform translate-y-full transition-transform duration-300 pointer-events-auto max-h-[85vh] flex flex-col">
                 <div class="p-4 pb-2 overflow-y-auto">
                     <div class="sheet-handle"></div>
-                    <h3 class="text-center font-semibold text-lg mb-4" data-i18n="tecuit_options">Options Tecuit</h3>
+                    <h3 class="text-center font-semibold text-lg mb-4 flex items-center justify-center gap-2" data-i18n="tecuit_options">
+                        Options Tecuit
+                        <span class="beta-badge text-[9px] px-1.5 py-0.5"><i class="fa-solid fa-flask"></i></span>
+                    </h3>
                     
                     <div class="grid grid-cols-3 gap-3 mb-6">
                         <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('camera')">
@@ -664,7 +724,10 @@
             <div class="absolute inset-0 flex items-center justify-center p-4">
                 <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-scale-in">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold" data-i18n="select_model">Sélectionner le modèle</h3>
+                        <h3 class="text-xl font-bold flex items-center gap-2" data-i18n="select_model">
+                            Sélectionner le modèle
+                            <span class="beta-badge text-[9px] px-1.5 py-0.5"><i class="fa-solid fa-flask"></i></span>
+                        </h3>
                         <button id="closeModelBtn" class="text-tecuit-subtext hover:text-white transition-colors btn-animate">
                             <i class="fa-solid fa-xmark text-xl"></i>
                         </button>
@@ -709,7 +772,10 @@
             <div class="absolute inset-0 flex items-center justify-center p-4">
                 <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-scale-in">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold" data-i18n="options">Options</h3>
+                        <h3 class="text-xl font-bold flex items-center gap-2" data-i18n="options">
+                            Options
+                            <span class="beta-badge text-[9px] px-1.5 py-0.5"><i class="fa-solid fa-flask"></i></span>
+                        </h3>
                         <button id="closeMenuBtn" class="text-tecuit-subtext hover:text-white transition-colors btn-animate">
                             <i class="fa-solid fa-xmark text-xl"></i>
                         </button>
@@ -738,7 +804,10 @@
                     </div>
 
                     <div class="mt-6 pt-4 border-t border-tecuit-border text-center">
-                        <p class="text-xs text-tecuit-subtext">Tecuit IA v2.1.0</p>
+                        <p class="text-xs text-tecuit-subtext flex items-center justify-center gap-2">
+                            Tecuit IA v2.1.0
+                            <span class="beta-badge text-[8px] px-1.5 py-0.5"><i class="fa-solid fa-flask"></i> BETA</span>
+                        </p>
                         <p class="text-[10px] text-tecuit-subtext mt-1">
                             <i class="fa-solid fa-shield-halved mr-1"></i> AES-256 Encryption + OCR
                         </p>
@@ -1250,88 +1319,6 @@
                 connection_error: "Erro de conexão",
                 backend_accessible: "Certifique-se de que o backend esteja acessível",
                 processing_file: "Processando arquivo..."
-            },
-            nl: {
-                login_subtitle: "Log in om toegang te krijgen tot uw gesprekken",
-                email: "E-mail",
-                password: "Wachtwoord",
-                login: "Inloggen",
-                no_account: "Nog geen account?",
-                register: "Registreren",
-                encryption_note: "Uw gegevens zijn versleuteld met AES-256",
-                create_account: "Account aanmaken",
-                register_subtitle: "Sluit je gratis aan bij Tecuit IA",
-                username: "Gebruikersnaam",
-                password_min: "Minimaal 6 tekens",
-                confirm_password: "Bevestig wachtwoord",
-                have_account: "Heb je al een account?",
-                conversations: "Gesprekken",
-                new_conversation: "Nieuw gesprek",
-                today: "Vandaag",
-                logout: "Uitloggen",
-                stop_generation: "Generatie stoppen",
-                disclaimer: "Tecuit IA kan fouten maken. Controleer belangrijke informatie.",
-                tecuit_options: "Tecuit Opties",
-                camera: "Camera",
-                photos: "Foto's",
-                files: "Bestanden",
-                create_image: "Afbeelding maken",
-                create_image_desc: "Visualiseer alles",
-                advanced_reasoning: "Geavanceerd redeneren",
-                advanced_reasoning_desc: "Langer nadenken",
-                deep_research: "Diep onderzoek",
-                deep_research_desc: "Gedetailleerde rapporten",
-                web_search: "Webzoekopdracht",
-                web_search_desc: "Real-time info",
-                study_learn: "Studeren & Leren",
-                study_learn_desc: "Nieuwe concepten",
-                select_model: "Model selecteren",
-                select_model_desc: "Kies de AI die bij uw behoeften past.",
-                fast: "Snel",
-                powerful: "Krachtig",
-                hermes_4b_desc: "Ideaal voor dagelijkse taken en snelheid.",
-                hermes_7b_desc: "Beste voor complex redeneren en code.",
-                user_memory: "Gebruikersgeheugen",
-                memory_note: "10GB opslag voor continuïteit",
-                options: "Opties",
-                export_conversation: "Gesprek exporteren",
-                export_desc: "Versleutelde JSON downloaden",
-                clear_conversation: "Gesprek wissen",
-                clear_desc: "Geschiedenis verwijderen",
-                welcome_message: "Hallo",
-                welcome_subtitle: "Ik ben Tecuit IA, uw intelligente assistent.",
-                help_with: "Ik kan u helpen met:",
-                smart_responses: "Slimme antwoorden met Hermes 4B/7B",
-                image_analysis: "Bestandsanalyse (tekst, afbeeldingen met OCR)",
-                web_research: "Webonderzoek",
-                memory_continuity: "10GB geheugen voor continuïteit",
-                encrypted_data: "AES-256 versleutelde gegevens",
-                new_conversation_created: "Nieuw gesprek aangemaakt",
-                model_changed: "Model gewijzigd naar",
-                model_activated: "geactiveerd",
-                feature_activated: "geactiveerd",
-                file_processed: "Bestand succesvol verwerkt",
-                file_too_large: "Bestand te groot (max 50MB)",
-                generation_stopped: "Generatie gestopt",
-                conversation_cleared: "Gesprek gewist",
-                conversation_exported: "Gesprek geëxporteerd (versleuteld)",
-                logged_out: "Succesvol uitgelogd",
-                wrong_password: "Onjuiste e-mail of wachtwoord",
-                email_used: "Dit e-mailadres is al in gebruik",
-                passwords_mismatch: "Wachtwoorden komen niet overeen",
-                password_min_length: "Wachtwoord moet minimaal 6 tekens zijn",
-                ocr_in_progress: "OCR bezig...",
-                no_text_detected: "Geen tekst gedetecteerd in afbeelding",
-                ocr_completed: "OCR voltooid",
-                characters: "tekens",
-                file_analyzed: "Bestand geanalyseerd",
-                size: "Grootte",
-                type: "Type",
-                extracted_text: "Geëxtraheerde tekst",
-                file_content: "Bestandsinhoud",
-                connection_error: "Verbindingsfout",
-                backend_accessible: "Zorg ervoor dat de backend toegankelijk is",
-                processing_file: "Bestand verwerken..."
             },
             ru: {
                 login_subtitle: "Войдите, чтобы получить доступ к вашим разговорам",
@@ -1988,6 +1975,88 @@
                 connection_error: "Błąd połączenia",
                 backend_accessible: "Upewnij się, że backend jest dostępny",
                 processing_file: "Przetwarzanie pliku..."
+            },
+            nl: {
+                login_subtitle: "Log in om toegang te krijgen tot uw gesprekken",
+                email: "E-mail",
+                password: "Wachtwoord",
+                login: "Inloggen",
+                no_account: "Nog geen account?",
+                register: "Registreren",
+                encryption_note: "Uw gegevens zijn versleuteld met AES-256",
+                create_account: "Account aanmaken",
+                register_subtitle: "Sluit je gratis aan bij Tecuit IA",
+                username: "Gebruikersnaam",
+                password_min: "Minimaal 6 tekens",
+                confirm_password: "Bevestig wachtwoord",
+                have_account: "Heb je al een account?",
+                conversations: "Gesprekken",
+                new_conversation: "Nieuw gesprek",
+                today: "Vandaag",
+                logout: "Uitloggen",
+                stop_generation: "Generatie stoppen",
+                disclaimer: "Tecuit IA kan fouten maken. Controleer belangrijke informatie.",
+                tecuit_options: "Tecuit Opties",
+                camera: "Camera",
+                photos: "Foto's",
+                files: "Bestanden",
+                create_image: "Afbeelding maken",
+                create_image_desc: "Visualiseer alles",
+                advanced_reasoning: "Geavanceerd redeneren",
+                advanced_reasoning_desc: "Langer nadenken",
+                deep_research: "Diep onderzoek",
+                deep_research_desc: "Gedetailleerde rapporten",
+                web_search: "Webzoekopdracht",
+                web_search_desc: "Real-time info",
+                study_learn: "Studeren & Leren",
+                study_learn_desc: "Nieuwe concepten",
+                select_model: "Model selecteren",
+                select_model_desc: "Kies de AI die bij uw behoeften past.",
+                fast: "Snel",
+                powerful: "Krachtig",
+                hermes_4b_desc: "Ideaal voor dagelijkse taken en snelheid.",
+                hermes_7b_desc: "Beste voor complex redeneren en code.",
+                user_memory: "Gebruikersgeheugen",
+                memory_note: "10GB opslag voor continuïteit",
+                options: "Opties",
+                export_conversation: "Gesprek exporteren",
+                export_desc: "Versleutelde JSON downloaden",
+                clear_conversation: "Gesprek wissen",
+                clear_desc: "Geschiedenis verwijderen",
+                welcome_message: "Hallo",
+                welcome_subtitle: "Ik ben Tecuit IA, uw intelligente assistent.",
+                help_with: "Ik kan u helpen met:",
+                smart_responses: "Slimme antwoorden met Hermes 4B/7B",
+                image_analysis: "Bestandsanalyse (tekst, afbeeldingen met OCR)",
+                web_research: "Webonderzoek",
+                memory_continuity: "10GB geheugen voor continuïteit",
+                encrypted_data: "AES-256 versleutelde gegevens",
+                new_conversation_created: "Nieuw gesprek aangemaakt",
+                model_changed: "Model gewijzigd naar",
+                model_activated: "geactiveerd",
+                feature_activated: "geactiveerd",
+                file_processed: "Bestand succesvol verwerkt",
+                file_too_large: "Bestand te groot (max 50MB)",
+                generation_stopped: "Generatie gestopt",
+                conversation_cleared: "Gesprek gewist",
+                conversation_exported: "Gesprek geëxporteerd (versleuteld)",
+                logged_out: "Succesvol uitgelogd",
+                wrong_password: "Onjuiste e-mail of wachtwoord",
+                email_used: "Dit e-mailadres is al in gebruik",
+                passwords_mismatch: "Wachtwoorden komen niet overeen",
+                password_min_length: "Wachtwoord moet minimaal 6 tekens zijn",
+                ocr_in_progress: "OCR bezig...",
+                no_text_detected: "Geen tekst gedetecteerd in afbeelding",
+                ocr_completed: "OCR voltooid",
+                characters: "tekens",
+                file_analyzed: "Bestand geanalyseerd",
+                size: "Grootte",
+                type: "Type",
+                extracted_text: "Geëxtraheerde tekst",
+                file_content: "Bestandsinhoud",
+                connection_error: "Verbindingsfout",
+                backend_accessible: "Zorg ervoor dat de backend toegankelijk is",
+                processing_file: "Bestand verwerken..."
             }
         };
 
