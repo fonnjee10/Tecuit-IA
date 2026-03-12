@@ -21,48 +21,11 @@ const ModelManager = {
             maxTokens: 4096,
             speed: 'Normal',
             power: 'Élevé'
-async function sendMessage() {
-
-    const text = input.value.trim();
-    if (!text || isGenerating) return;
-
-    appendMessage(text, 'user');
-    input.value = '';
-
-    isGenerating = true;
-    stopButtonContainer.classList.remove('hidden');
-
-    abortController = new AbortController();
-
-    try {
-
-        const res = await fetch(API_BASE_URL + "/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "nousresearch/nous-hermes-2-mistral-7b-dpo",
-                messages: conversationHistory.map(m => ({
-                    role: m.role === "tecuit" ? "assistant" : m.role,
-                    content: m.content
-                })),
-                stream: true,
-                temperature: 0.7,
-                max_tokens: 2048
-            }),
-            signal: abortController.signal
-        });
-
-        if (!res.ok) {
-            throw new Error("HTTP " + res.status);
-}
+        }
     },
 
     // Modèle actuel
     currentModel: 'Hermes 4B',
-        const messageId = appendMessage("", "tecuit", false);
-        const tecuitDiv = document.getElementById(messageId);
 
     // Initialisation
     init: function() {
@@ -82,67 +45,20 @@ async function sendMessage() {
             console.log('[ModelManager] Modèles disponibles:', Object.keys(this.models));
             return false;
         }
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-
-        let fullReply = "";
-
-        while (true) {
-
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value);
-
-            const lines = chunk.split("\n");
-
-            for (const line of lines) {
-
-                if (!line.startsWith("data:")) continue;
-
-                const data = line.replace("data:", "").trim();
-
-                if (data === "[DONE]") break;
 
         const previousModel = this.currentModel;
         this.currentModel = modelName;
-                try {
 
         // Sauvegarder dans localStorage
         localStorage.setItem('tecuit_current_model', modelName);
-                    const json = JSON.parse(data);
-                    const token = json.choices?.[0]?.delta?.content || "";
 
         console.log('[ModelManager] Modèle changé:', previousModel, '->', modelName);
         console.log('[ModelManager] API Model:', this.models[modelName].apiModel);
-                    fullReply += token;
 
         // Callback si défini
         if (this.onModelChange) {
             this.onModelChange(modelName, this.models[modelName]);
-                    if (tecuitDiv) {
-                        tecuitDiv.innerHTML = formatMessage(fullReply);
-                    }
-
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                } catch (e) {
-                    console.log("JSON parse skip");
-                }
-
-            }
-
         }
-
-        if (fullReply) {
-            conversationHistory.push({
-                role: "tecuit",
-                content: fullReply
-            });
-
-            saveToLocalStorage();
-            saveCurrentConversation();
-}
 
         return true;
     },
@@ -195,24 +111,175 @@ async function sendMessage() {
     // Définir le callback
     setOnModelChange: function(callback) {
         this.onModelChange = callback;
-    } catch (err) {
-
-        console.error(err);
-
-        appendMessage(
-            "⚠️ Impossible de contacter le serveur IA.",
-            "tecuit"
-        );
-
-}
+    }
 };
 
 // ==================== Intégration avec TecuitChat ====================
-    isGenerating = false;
-    stopButtonContainer.classList.add("hidden");
 
-@@ -283,3 +168,4 @@ TecuitChat.sendMessage('Bonjour', {
-   model: 'Hermes 7B'
+function setupModelSwitching() {
+    // Initialiser le gestionnaire de modèles
+    ModelManager.init();
+
+    // Fonction pour changer de modèle dans l'interface
+    window.switchToModel = function(modelName) {
+        const success = ModelManager.setModel(modelName);
+        if (success) {
+            // Mettre à jour l'affichage
+            const modelDisplay = document.getElementById('current-model-display');
+            if (modelDisplay) {
+                modelDisplay.textContent = modelName;
+            }
+
+            // Afficher une notification
+            showToast('Modèle changé: ' + modelName);
+
+            // Sauvegarder dans la conversation actuelle
+            if (typeof TecuitChat !== 'undefined') {
+                TecuitChat.setModel(modelName);
+            }
+        }
+        return success;
+    };
+
+    // Fonction pour basculer entre 4B et 7B
+    window.toggleModel = function() {
+        const newModel = ModelManager.toggleModel();
+        const modelDisplay = document.getElementById('current-model-display');
+        if (modelDisplay) {
+            modelDisplay.textContent = ModelManager.getModel();
+        }
+        showToast('Modèle: ' + ModelManager.getModel());
+        return newModel;
+    };
+
+    // Fonction pour afficher les détails du modèle
+    window.showModelDetails = function(modelName) {
+        const details = ModelManager.getModelDetails(modelName);
+        if (!details) return null;
+
+        return {
+            name: details.name,
+            description: details.description,
+            speed: details.speed,
+            power: details.power,
+            temperature: details.temperature,
+            maxTokens: details.maxTokens,
+            apiModel: details.apiModel
+        };
+    };
+
+    console.log('[Tecuit] Model Switching activé');
+    console.log('[Tecuit] Modèles disponibles:', ModelManager.getAvailableModels());
+
+    return ModelManager;
+}
+
+// ==================== Fonctions Utilitaires ====================
+
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+
+    if (toast && toastMessage) {
+        toastMessage.textContent = message;
+        toast.classList.remove('opacity-0', 'pointer-events-none');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.remove('opacity-100');
+            toast.classList.add('opacity-0', 'pointer-events-none');
+        }, duration);
+    } else {
+        console.log('[Toast]', message);
+    }
+}
+
+// ==================== Configuration API avec le modèle ====================
+
+async function sendRequestWithModel(message, options = {}) {
+    const modelName = options.model || ModelManager.getModel();
+    const modelConfig = ModelManager.getModelConfig(modelName);
+    const apiModel = ModelManager.getApiModel(modelName);
+
+    if (!apiModel) {
+        throw new Error('Modèle non configuré: ' + modelName);
+    }
+
+    console.log('[API] Envoi avec modèle:', {
+        displayName: modelName,
+        apiModel: apiModel,
+        temperature: modelConfig.temperature,
+        maxTokens: modelConfig.maxTokens
+    });
+
+    const response = await fetch('https://zenkaritecuitai.ngrok.app/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream'
+        },
+        body: JSON.stringify({
+            model: apiModel,
+            messages: options.messages || [],
+            stream: options.stream !== false,
+            temperature: options.temperature || modelConfig.temperature,
+            max_tokens: options.maxTokens || modelConfig.maxTokens
+        })
+    });
+
+    return response;
+}
+
+// ==================== Export ====================
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        ModelManager,
+        setupModelSwitching,
+        sendRequestWithModel
+    };
+}
+
+if (typeof window !== 'undefined') {
+    window.ModelManager = ModelManager;
+    window.setupModelSwitching = setupModelSwitching;
+    window.sendRequestWithModel = sendRequestWithModel;
+}
+
+// ==================== Exemple d'utilisation ====================
+
+/*
+// Initialisation
+ModelManager.init();
+
+// Changer de modèle
+ModelManager.setModel('Hermes 7B');
+
+// Obtenir le modèle actuel
+const current = ModelManager.getModel(); // 'Hermes 7B'
+
+// Obtenir les détails
+const details = ModelManager.getModelDetails('Hermes 4B');
+console.log(details); // { name: 'Hermes 4B', speed: 'Rapide', ... }
+
+// Basculer entre les modèles
+ModelManager.toggleModel();
+
+// Callback
+ModelManager.setOnModelChange(function(modelName, modelDetails) {
+    console.log('Nouveau modèle:', modelName);
+    console.log('Détails:', modelDetails);
+});
+
+// Avec TecuitChat
+TecuitChat.init({
+    onModelChange: function(modelName, details) {
+        console.log('Modèle changé:', modelName);
+    }
+});
+
+// Envoyer un message avec un modèle spécifique
+TecuitChat.sendMessage('Bonjour', {
+    model: 'Hermes 7B'
 });
 */
-}
