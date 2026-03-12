@@ -1,1478 +1,1766 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tecuit IA - Assistant Intelligent</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CryptoJS for AES-256 Encryption -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    
-    <!-- Tesseract.js for OCR -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    
-    <!-- Fontsource Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Zenkari Menu - Unified Launcher with AI</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%233b82f6;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%238b5cf6;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='45' fill='url(%23grad)'/%3E%3Cpath d='M30 50 L45 35 L70 60 M45 35 L45 65' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='70' cy='30' r='8' fill='%2310b981'/%3E%3C/svg%3E">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    padding: 60px 20px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 20px 20px;
+}
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+.logo-crypto {
+    width: 100px; height: 100px;
+    margin: 0 auto 20px;
+    position: relative; z-index: 1;
+    animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.logo-crypto svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    animation: rotateLogo 10s linear infinite;
+}
+@keyframes rotateLogo { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.header h1 {
+    font-size: 42px; margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    position: relative; z-index: 1;
+}
+.header p {
+    font-size: 18px; margin-bottom: 25px;
+    opacity: 0.9; position: relative; z-index: 1;
+}
+.lang-selector {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10;
+}
+.lang-selector option { background: #1a1a2e; color: white; }
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: -40px;
+    padding: 0 20px;
+}
+.app-card {
+    background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid #3b82f6;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+.app-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.app-card:hover::before { opacity: 1; }
+.app-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+    border-color: #10b981;
+}
+.app-icon {
+    width: 70px; height: 70px;
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 15px;
+    font-size: 32px;
+}
+.app-card h3 {
+    color: #10b981;
+    font-size: 22px; margin-bottom: 10px; text-align: center;
+}
+.app-card .version {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 4px 12px; border-radius: 12px;
+    font-size: 11px; font-weight: bold;
+    display: inline-block; margin-bottom: 15px;
+}
+.app-card p {
+    color: #9ca3af;
+    font-size: 13px; text-align: center;
+    margin-bottom: 20px; line-height: 1.6;
+}
+.app-features { list-style: none; margin-bottom: 20px; }
+.app-features li {
+    padding: 6px 0; font-size: 12px; color: #6b7280;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+.app-features li:last-child { border-bottom: none; }
+.app-features li::before {
+    content: '✓'; color: #10b981;
+    margin-right: 8px; font-weight: bold;
+}
+.launch-btn {
+    width: 100%; padding: 14px 20px;
+    border: none; border-radius: 8px;
+    font-weight: bold; font-size: 14px;
+    cursor: pointer; transition: all 0.3s;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white; text-transform: uppercase;
+    letter-spacing: 1px; text-decoration: none;
+    display: inline-block; text-align: center;
+}
+.launch-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+.app-card.download-app .launch-btn {
+    background: linear-gradient(135deg, #1671f9, #0c74ea);
+    color: white;
+}
+.app-card.download-app:hover {
+    border-color: #1671f9;
+    box-shadow: 0 15px 35px rgba(22, 113, 249, 0.3);
+}
+.app-card.python-app .launch-btn {
+    background: linear-gradient(135deg, #fb2424, #0b84f5);
+    color: black;
+}
+.app-card.python-app:hover {
+    border-color: #2456fb;
+    box-shadow: 0 15px 35px rgba(251, 36, 36, 0.3);
+}
+.status-bar {
+    background: #1a1a1a;
+    padding: 15px 20px; margin-top: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 15px;
+}
+.status-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #9ca3af;
+}
+.status-item .indicator {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #10b981; animation: blink 2s infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        tecuit: {
-                            dark: '#09090b',
-                            card: '#18181b',
-                            accent: '#6366f1',
-                            accentHover: '#4f46e5',
-                            border: '#27272a',
-                            text: '#e4e4e7',
-                            subtext: '#a1a1aa'
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                        'typing': 'typing 1.5s infinite'
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(100%)' },
-                            '100%': { transform: 'translateY(0)' },
-                        },
-                        typing: {
-                            '0%, 100%': { opacity: '0.3' },
-                            '50%': { opacity: '1' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+/* Contact Section Styles */
+#contact {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border-radius: 12px;
+    padding: 30px 15px;
+    margin: 20px 15px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#contact h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #3b82f6;
+}
+.form-group { margin-bottom: 15px; }
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #3b82f6;
+    background: #0a0a0a;
+    color: white;
+    font-family: inherit;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+.btn {
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    text-align: center;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #09090b; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+/* AI Chat Section Styles */
+#ai-chat-section {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border-radius: 12px;
+    padding: 30px 15px;
+    margin: 20px 15px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+}
+#ai-chat-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.chat-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+.chat-controls .btn {
+    width: auto;
+    padding: 10px 16px;
+    font-size: 12px;
+}
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+.btn-warning {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: black;
+}
+.btn-teal {
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    color: white;
+}
+#chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: #1f1f1f;
+    border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    margin-bottom: 15px;
+    min-height: 300px;
+    max-height: 400px;
+}
+.msg {
+    max-width: 70%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    word-wrap: break-word;
+    animation: fadeIn 0.3s ease;
+}
+.user {
+    background: #1eaedb;
+    align-self: flex-end;
+    color: white;
+}
+.tecuit {
+    background: #2a2f3a;
+    align-self: flex-start;
+    color: #e0e0e0;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+#chat-footer {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #1f1f1f;
+    border-top: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 0 0 10px 10px;
+}
+#chat-input {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid #3b82f6;
+    outline: none;
+    font-size: 1rem;
+    background: #2d2d2d;
+    color: white;
+    min-height: 44px;
+    resize: none;
+}
+#chat-input:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+#sendBtn, #fileUploadBtn, #stopGenBtn {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 20px;
+    background: #1eaedb;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    min-width: 60px;
+    height: 44px;
+}
+#fileUploadBtn {
+    background: #8b5cf6;
+}
+#stopGenBtn {
+    background: #ef4444;
+    display: none;
+}
+#fileInput {
+    display: none;
+}
+#tecuit-thinking {
+    color: #6c757d;
+    font-style: italic;
+    margin: 5px 0;
+    display: none;
+    padding: 0.4rem 0.6rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: fit-content;
+    align-self: flex-start;
+}
+.typing-indicator {
+    display: inline-block;
+    margin-left: 8px;
+}
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    margin: 0 2px;
+    opacity: 0;
+    animation: typingDots 1.4s infinite ease-in-out;
+}
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDots {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+#typingPreview {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-top: 4px;
+    min-height: 18px;
+    text-align: right;
+    padding-right: 8px;
+    font-style: italic;
+    display: none;
+}
 
-        .message-bubble {
-            max-width: 85%;
-            border-radius: 18px;
-            padding: 12px 16px;
-            line-height: 1.6;
-            font-size: 0.95rem;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        .user-msg {
-            background-color: #27272a;
-            color: #fff;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-msg {
-            background-color: transparent;
-            color: #e4e4e7;
-            align-self: flex-start;
-            padding-left: 0;
-        }
-
-        .model-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-            background: rgba(99, 102, 241, 0.15);
-            color: #818cf8;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-
-        .sheet-handle {
-            width: 40px;
-            height: 4px;
-            background-color: #3f3f46;
-            border-radius: 2px;
-            margin: 0 auto 16px auto;
-        }
-
-        .feature-item:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .typing-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #a1a1aa;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: typing 1.4s infinite;
-        }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .glow-effect {
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
-        }
-
-        /* Auth Pages */
-        .auth-container {
-            display: none;
-        }
-        .auth-container.active {
-            display: flex;
-        }
-
-        .auth-card {
-            background: rgba(24, 24, 27, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(39, 39, 42, 0.5);
-        }
-
-        .input-field {
-            background: rgba(9, 9, 11, 0.8);
-            border: 1px solid rgba(39, 39, 42, 0.5);
-            transition: all 0.3s;
-        }
-        .input-field:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        /* Main App */
-        #main-app {
-            display: none;
-        }
-        #main-app.active {
-            display: flex;
-        }
-
-        /* File Upload Progress */
-        .file-progress {
-            background: rgba(99, 102, 241, 0.2);
-            border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
-        }
-        .file-progress-bar {
-            height: 4px;
-            background: #6366f1;
-            border-radius: 2px;
-            transition: width 0.3s;
-        }
-    </style>
+.footer {
+    text-align: center; padding: 30px 20px;
+    margin-top: 40px; color: #6b7280;
+    font-size: 12px; border-top: 2px solid rgba(59, 130, 246, 0.3);
+}
+.lang-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    animation: pulse 2s infinite;
+}
+@media (max-width: 768px) {
+    .header h1 { font-size: 32px; }
+    .header p { font-size: 14px; }
+    .app-grid { grid-template-columns: 1fr; margin-top: -20px; }
+    .status-bar { flex-direction: column; text-align: center; }
+    .lang-selector { position: relative; top: 0; right: 0; margin: 0 auto 15px; display: block; }
+    #chat { min-height: 250px; }
+    .chat-controls { justify-content: center; }
+}
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #2563eb, #7c3aed);
+}
+</style>
 </head>
-<body class="h-screen overflow-hidden">
+<body>
+<div class="header">
+    <select class="lang-selector" id="languageSelector" onchange="changeLanguage()">
+        <option value="en">🇬🇧 English</option>
+        <option value="fr" selected>🇫🇷 Français</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="hi">🇮🇳 हिन्दी</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="pt">🇵🇹 Português</option>
+        <option value="bn">🇧🇩 বাংলা</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="vi">🇻🇳 Tiếng Việt</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="tr">🇹🇷 Türkçe</option>
+    </select>
+    <div class="logo-crypto">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                </linearGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#grad1)" filter="url(#glow)"/>
+            <path d="M30 50 L45 35 L70 60 M45 35 L45 65" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="70" cy="30" r="8" fill="#10b981"/>
+            <circle cx="30" cy="70" r="6" fill="#fbbf24"/>
+        </svg>
+    </div>
+    <h1 data-i18n="title">Zenkari Menu</h1>
+    <p data-i18n="subtitle">Unified security platform - Choose your application</p>
+</div>
 
-    <!-- ==================== AUTHENTICATION PAGES ==================== -->
-    <div id="auth-pages" class="auth-container active h-screen items-center justify-center p-4">
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
+<div class="container">
+    <div class="app-grid">
+        <!-- ZK 10.0.0F - Web Version -->
+        <div class="app-card">
+            <div class="app-icon">🌐</div>
+            <h3 data-i18n="zk_web_title">ZenkariApp Web</h3>
+            <span class="version">v10.0.0F</span>
+            <p data-i18n="zk_web_desc">Secure messaging & file encryption - Web Version</p>
+            <ul class="app-features">
+                <li data-i18n="feat_rsa">RSA-3072 + AES-256 Encryption</li>
+                <li data-i18n="feat_signed">Cryptographically signed messages</li>
+                <li data-i18n="feat_files">File encryption (500MB max)</li>
+                <li data-i18n="feat_qr">Secure QR Codes</li>
+                <li data-i18n="feat_logs">Encrypted logs</li>
+                <li data-i18n="feat_ai">Integrated AI</li>
+                <li data-i18n="feat_langs">15 languages supported</li>
+            </ul>
+            <a href="https://Zenkari-app-free.vercel.app" target="_blank" rel="noopener noreferrer" class="launch-btn" data-i18n="btn_launch">Launch Web</a>
+        </div>
+        <!-- ZK 9.8.9F - Windows Download -->
+        <div class="app-card download-app">
+            <div class="app-icon">🖥️</div>
+            <h3 data-i18n="zk_win_title">ZenkariApp Windows</h3>
+            <span class="version">v9.8.9F</span>
+            <p data-i18n="zk_win_desc">Native Windows application - download</p>
+            <ul class="app-features">
+                <li data-i18n="feat_native">Native Windows desktop app</li>
+                <li data-i18n="feat_rsa">RSA-3072 + AES-256 Encryption</li>
+                <li data-i18n="feat_offline">Works offline</li>
+                <li data-i18n="feat_local">Secure local storage</li>
+                <li data-i18n="feat_auto">Automatic updates</li>
+                <li data-i18n="feat_compat">Windows 10/11 compatible</li>
+                <li data-i18n="feat_langs">15 languages supported</li>
+            </ul>
+            <a href="https://archive.org/details/Zenkari" target="_blank" rel="noopener noreferrer" class="launch-btn" data-i18n="btn_download">Download ZK</a>
+        </div>
+        <!-- ZKP 9.8.5 - Archive -->
+        <div class="app-card python-app">
+            <div class="app-icon">🖥️</div>
+            <h3 data-i18n="zkp_title">ZenkariPass</h3>
+            <span class="version">v9.8.5</span>
+            <p data-i18n="zkp_archive_desc">Password manager with 2FA - Download</p>
+            <ul class="app-features">
+                <li data-i18n="feat_rsa4096">RSA-4096 + AES-256 Encryption</li>
+                <li data-i18n="feat_2fa">Two-factor authentication (TOTP)</li>
+                <li data-i18n="feat_gen">Password generator</li>
+                <li data-i18n="feat_cats">Organized categories</li>
+                <li data-i18n="feat_lock">Auto-lock feature</li>
+                <li data-i18n="feat_export">Secure export/import</li>
+                <li data-i18n="feat_langs">15 languages supported</li>
+            </ul>
+            <a href="https://archive.org/details/zkp-9.8.5_202601" target="_blank" rel="noopener noreferrer" class="launch-btn" data-i18n="btn_archive">Download ZKP</a>
+        </div>
+        <!-- ZKP 9.8.5 - Web Version -->
+        <div class="app-card python-app">
+            <div class="app-icon">🌐</div>
+            <h3 data-i18n="zkp_title">ZenkariPass</h3>
+            <span class="version">v9.8.5</span>
+            <p data-i18n="zkp_web_desc">Password manager with 2FA - Web</p>
+            <ul class="app-features">
+                <li data-i18n="feat_rsa4096">RSA-4096 + AES-256 Encryption</li>
+                <li data-i18n="feat_2fa">Two-factor authentication (TOTP)</li>
+                <li data-i18n="feat_gen">Password generator</li>
+                <li data-i18n="feat_cats">Organized categories</li>
+                <li data-i18n="feat_lock">Auto-lock feature</li>
+                <li data-i18n="feat_export">Secure export/import</li>
+                <li data-i18n="feat_langs">15 languages supported</li>
+            </ul>
+            <a href="https://zenkari-pass.vercel.app/" target="_blank" rel="noopener noreferrer" class="launch-btn" data-i18n="btn_launch">Launch Web</a>
+        </div>
+        <!-- ZKPA 4.0.0 - Authenticator Python -->
+        <div class="app-card python-app">
+            <div class="app-icon">🖥️</div>
+            <h3 data-i18n="zkpa_title">ZenkariPass Authenticator</h3>
+            <span class="version">v4.0.0</span>
+            <p data-i18n="zkpa_desc">2FA authenticator with QR detection - Download</p>
+            <ul class="app-features">
+                <li data-i18n="feat_totp">TOTP code generation</li>
+                <li data-i18n="feat_aes_sha">AES-256 & SHA-256 encryption</li>
+                <li data-i18n="feat_qr_detect">QR detection via screenshot</li>
+                <li data-i18n="feat_tz">All timezones supported</li>
+                <li data-i18n="feat_local_enc">Encrypted local storage</li>
+                <li data-i18n="feat_offline">Offline capable</li>
+                <li data-i18n="feat_langs">15 languages supported</li>
+            </ul>
+            <a href="https://archive.org/details/zkpa-4.0.0" target="_blank" rel="noopener noreferrer" class="launch-btn" data-i18n="btn_download_zkpa">Download ZKPA</a>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="indicator"></div>
+            <span data-i18n="status_operational">All applications are operational</span>
+        </div>
+        <div class="status-item">
+            <span data-i18n="status_encryption">🔒 Encryption: AES-256 / RSA-4096</span>
+        </div>
+        <div class="status-item">
+            <span data-i18n="status_apps">📊 5 Applications available</span>
+        </div>
+    </div>
+
+    <!-- AI Chat Section -->
+    <section id="ai-chat-section">
+        <h2>
+            <span>🤖</span>
+            <span data-i18n="ai_chat_title">Zenkari AI Assistant</span>
+        </h2>
+        <div class="chat-controls">
+            <button class="btn btn-danger" onclick="clearConversation()" data-i18n="btn_clear_chat">🗑 Clear</button>
+            <button class="btn btn-warning" onclick="exportConversation()" data-i18n="btn_export_chat">💾 Export</button>
+            <button class="btn btn-teal" onclick="toggleAITheme()" data-i18n="btn_theme_chat">🎨 Theme</button>
+        </div>
+        <div id="chat"></div>
+        <div id="tecuit-thinking">
+            <span data-i18n="ai_thinking">Tecuit...</span>
+            <div class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div id="chat-footer">
+            <input type="text" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Type your message...">
+            <button id="fileUploadBtn" onclick="document.getElementById('fileInput').click()">📎</button>
+            <input type="file" id="fileInput" onchange="handleFileUpload(this.files[0])">
+            <button id="sendBtn">➤</button>
+            <button id="stopGenBtn" class="btn-danger" onclick="stopGeneration()">⏹</button>
+        </div>
+        <div id="typingPreview"></div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 id="contact-title" data-i18n="contact_title">📧 Aide / Help</h2>
+        <form onsubmit="handleContactForm(event)">
+            <div class="form-group">
+                <input type="text" id="contactName" class="form-input" data-i18n-placeholder="contact_name" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="contactEmail" class="form-input" data-i18n-placeholder="contact_email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <textarea id="contactMessage" class="form-input" data-i18n-placeholder="contact_message" placeholder="Text" required style="min-height: 100px; resize: vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">➥</button>
+        </form>
+    </section>
+
+    <div class="footer">
+        <div class="logo-crypto" style="width: 40px; height: 40px; margin: 0 auto 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <defs>
+                    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#grad4)" opacity="0.7"/>
+                <path d="M30 50 L45 35 L70 60 M45 35 L45 65" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="70" cy="30" r="8" fill="#10b981"/>
+            </svg>
+        </div>
+        <p data-i18n="footer_copyright">© 2026 Zenkari Suite - All rights reserved</p>
+        <p data-i18n="footer_versions">Made by LE$TER | Versions: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0</p>
+    </div>
+</div>
+
+<div class="lang-indicator" id="langIndicator">🇫🇷 FR</div>
+
+<script>
+// ==================== TRANSLATIONS (15 LANGUAGES) ====================
+const translations = {
+    en: {
+        title: "Zenkari Menu",
+        subtitle: "Unified security platform - Choose your application",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Secure messaging & file encryption - Web Version",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Native Windows application - Free download",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Password manager with 2FA - Archive",
+        zkp_web_desc: "Password manager with 2FA - Web Version",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "2FA authenticator with QR detection (Python)",
+        feat_rsa: "RSA-3072 + AES-256 Encryption",
+        feat_rsa4096: "RSA-4096 + AES-256 Encryption",
+        feat_signed: "Cryptographically signed messages",
+        feat_files: "File encryption (500MB max)",
+        feat_qr: "Secure QR Codes",
+        feat_logs: "Encrypted logs",
+        feat_ai: "Integrated AI",
+        feat_native: "Native Windows desktop app",
+        feat_offline: "Works offline",
+        feat_local: "Secure local storage",
+        feat_auto: "Automatic updates",
+        feat_compat: "Windows 10/11 compatible",
+        feat_2fa: "Two-factor authentication (TOTP)",
+        feat_gen: "Password generator",
+        feat_cats: "Organized categories",
+        feat_lock: "Auto-lock feature",
+        feat_export: "Secure export/import",
+        feat_totp: "TOTP code generation",
+        feat_aes_sha: "AES-256 & SHA-256 encryption",
+        feat_qr_detect: "QR detection via screenshot",
+        feat_tz: "All timezones supported",
+        feat_local_enc: "Encrypted local storage",
+        feat_langs: "15 languages supported",
+        btn_launch: "Launch Web",
+        btn_download: "Download ZK",
+        btn_archive: "Download ZKP",
+        btn_download_zkpa: "Download ZKPA",
+        status_operational: "All applications are operational",
+        status_encryption: "🔒 Encryption: AES-256 / RSA-4096",
+        status_apps: "📊 5 Applications available",
+        footer_copyright: "© 2026 Zenkari Menu - All rights reserved",
+        footer_versions: "Made by LE$TER | Versions: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI Assistant",
+        btn_clear_chat: "🗑 Clear",
+        btn_export_chat: "💾 Export",
+        btn_theme_chat: "🎨 Theme",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Type your message...",
+        contact_title: "📧 Contact / Help",
+        contact_name: "Name",
+        contact_email: "Email",
+        contact_message: "Message"
+    },
+    fr: {
+        title: "Menu Zenkari",
+        subtitle: "Plateforme de sécurité unifiée - Choisissez votre application",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Messagerie sécurisée & chiffrement - Version Web",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Application Windows native - Téléchargement gratuit",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Gestionnaire de mots de passe avec A2F - Archive",
+        zkp_web_desc: "Gestionnaire de mots de passe avec A2F - Version Web",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "Authentificateur 2FA avec détection QR (Python)",
+        feat_rsa: "Chiffrement RSA-3072 + AES-256",
+        feat_rsa4096: "Chiffrement RSA-4096 + AES-256",
+        feat_signed: "Messages signés cryptographiquement",
+        feat_files: "Chiffrement de fichiers (500MB max)",
+        feat_qr: "QR Codes sécurisés",
+        feat_logs: "Logs cryptés",
+        feat_ai: "IA intégrée",
+        feat_native: "Application desktop Windows native",
+        feat_offline: "Fonctionne hors ligne",
+        feat_local: "Stockage local sécurisé",
+        feat_auto: "Mises à jour automatiques",
+        feat_compat: "Compatible Windows 10/11",
+        feat_2fa: "Authentification 2 facteurs (TOTP)",
+        feat_gen: "Générateur de mots de passe",
+        feat_cats: "Catégories organisées",
+        feat_lock: "Verrouillage automatique",
+        feat_export: "Export/Import sécurisé",
+        feat_totp: "Génération de codes TOTP",
+        feat_aes_sha: "Chiffrement AES-256 et SHA-256",
+        feat_qr_detect: "Détection QR par screenshot",
+        feat_tz: "Tous fuseaux horaires supportés",
+        feat_local_enc: "Stockage local chiffré",
+        feat_langs: "15 langues supportées",
+        btn_launch: "Lancer Web",
+        btn_download: "Télécharger ZK",
+        btn_archive: "Télécharger ZKP",
+        btn_download_zkpa: "Télécharger ZKPA",
+        status_operational: "Toutes les applications sont opérationnelles",
+        status_encryption: "🔒 Chiffrement: AES-256 / RSA-4096",
+        status_apps: "📊 5 Applications disponibles",
+        footer_copyright: "© 2026 Zenkari Menu - Tous droits réservés",
+        footer_versions: "Made by LE$TER | Versions: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Assistant IA Zenkari",
+        btn_clear_chat: "🗑 Effacer",
+        btn_export_chat: "💾 Exporter",
+        btn_theme_chat: "🎨 Thème",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Tapez votre message...",
+        contact_title: "📧 Contact / Aide",
+        contact_name: "Nom",
+        contact_email: "Email",
+        contact_message: "Message"
+    },
+    es: {
+        title: "Menú Zenkari",
+        subtitle: "Plataforma de seguridad unificada - Elija su aplicación",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Mensajería segura y cifrado - Versión Web",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Aplicación nativa de Windows - Descarga gratuita",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Gestor de contraseñas con 2FA - Archivo",
+        zkp_web_desc: "Gestor de contraseñas con 2FA - Versión Web",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "Autenticador 2FA con detección QR (Python)",
+        feat_rsa: "Cifrado RSA-3072 + AES-256",
+        feat_rsa4096: "Cifrado RSA-4096 + AES-256",
+        feat_signed: "Mensajes firmados criptográficamente",
+        feat_files: "Cifrado de archivos (500MB máx)",
+        feat_qr: "Códigos QR seguros",
+        feat_logs: "Registros cifrados",
+        feat_ai: "IA integrada",
+        feat_native: "Aplicación de escritorio nativa",
+        feat_offline: "Funciona sin conexión",
+        feat_local: "Almacenamiento local seguro",
+        feat_auto: "Actualizaciones automáticas",
+        feat_compat: "Compatible con Windows 10/11",
+        feat_2fa: "Autenticación de dos factores (TOTP)",
+        feat_gen: "Generador de contraseñas",
+        feat_cats: "Categorías organizadas",
+        feat_lock: "Bloqueo automático",
+        feat_export: "Exportación/Importación segura",
+        feat_totp: "Generación de códigos TOTP",
+        feat_aes_sha: "Cifrado AES-256 y SHA-256",
+        feat_qr_detect: "Detección QR por captura",
+        feat_tz: "Todas las zonas horarias",
+        feat_local_enc: "Almacenamiento local cifrado",
+        feat_langs: "15 idiomas soportados",
+        btn_launch: "Lanzar Web",
+        btn_download: "Descargar ZK",
+        btn_archive: "Descargar ZKP",
+        btn_download_zkpa: "Descargar ZKPA",
+        status_operational: "Todas las aplicaciones están operativas",
+        status_encryption: "🔒 Cifrado: AES-256 / RSA-4096",
+        status_apps: "📊 5 Aplicaciones disponibles",
+        footer_copyright: "© 2026 Zenkari Menu - Todos los derechos reservados",
+        footer_versions: "Hecho por LE$TER | Versiones: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Asistente IA Zenkari",
+        btn_clear_chat: "🗑 Limpiar",
+        btn_export_chat: "💾 Exportar",
+        btn_theme_chat: "🎨 Tema",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Escribe tu mensaje...",
+        contact_title: "📧 Contacto / Ayuda",
+        contact_name: "Nombre",
+        contact_email: "Email",
+        contact_message: "Mensaje"
+    },
+    zh: {
+        title: "Zenkari 菜单",
+        subtitle: "统一安全平台 - 选择您的应用程序",
+        zk_web_title: "ZenkariApp 网页版",
+        zk_web_desc: "安全消息和文件加密 - 网页版",
+        zk_win_title: "ZenkariApp Windows 版",
+        zk_win_desc: "原生 Windows 应用 - 免费下载",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "带 2FA 的密码管理器 - 存档版",
+        zkp_web_desc: "带 2FA 的密码管理器 - 网页版",
+        zkpa_title: "ZenkariPass 身份验证器",
+        zkpa_desc: "带 QR 检测的 2FA 验证器 (Python)",
+        feat_rsa: "RSA-3072 + AES-256 加密",
+        feat_rsa4096: "RSA-4096 + AES-256 加密",
+        feat_signed: "加密签名的消息",
+        feat_files: "文件加密 (最大 500MB)",
+        feat_qr: "安全二维码",
+        feat_logs: "加密日志",
+        feat_ai: "集成人工智能",
+        feat_native: "原生 Windows 桌面应用",
+        feat_offline: "离线工作",
+        feat_local: "安全本地存储",
+        feat_auto: "自动更新",
+        feat_compat: "兼容 Windows 10/11",
+        feat_2fa: "双重身份验证 (TOTP)",
+        feat_gen: "密码生成器",
+        feat_cats: "分类组织",
+        feat_lock: "自动锁定",
+        feat_export: "安全导出/导入",
+        feat_totp: "TOTP 代码生成",
+        feat_aes_sha: "AES-256 和 SHA-256 加密",
+        feat_qr_detect: "截图二维码检测",
+        feat_tz: "支持所有时区",
+        feat_local_enc: "加密本地存储",
+        feat_langs: "支持 15 种语言",
+        btn_launch: "启动网页版",
+        btn_download: "下载 ZK",
+        btn_archive: "下载 ZKP",
+        btn_download_zkpa: "下载 ZKPA",
+        status_operational: "所有应用程序均可运行",
+        status_encryption: "🔒 加密：AES-256 / RSA-4096",
+        status_apps: "📊 5 个应用程序可用",
+        footer_copyright: "© 2026 Zenkari Menu - 保留所有权利",
+        footer_versions: "由 LE$TER 制作 | 版本：ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI 助手",
+        btn_clear_chat: "🗑 清除",
+        btn_export_chat: "💾 导出",
+        btn_theme_chat: "🎨 主题",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "输入您的消息...",
+        contact_title: "📧 联系/帮助",
+        contact_name: "姓名",
+        contact_email: "邮箱",
+        contact_message: "消息"
+    },
+    hi: {
+        title: "Zenkari मेनू",
+        subtitle: "एकीकृत सुरक्षा प्लेटफ़ॉर्म - अपना एप्लिकेशन चुनें",
+        zk_web_title: "ZenkariApp वेब",
+        zk_web_desc: "सुरक्षित संदेश और एन्क्रिप्शन - वेब संस्करण",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "नेटिव विंडोज एप्लिकेशन - मुफ्त डाउनलोड",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "2FA के साथ पासवर्ड मैनेजर - आर्काइव",
+        zkp_web_desc: "2FA के साथ पासवर्ड मैनेजर - वेब संस्करण",
+        zkpa_title: "ZenkariPass प्रमाणक",
+        zkpa_desc: "QR डिटेक्शन के साथ 2FA प्रमाणक (Python)",
+        feat_rsa: "RSA-3072 + AES-256 एन्क्रिप्शन",
+        feat_rsa4096: "RSA-4096 + AES-256 एन्क्रिप्शन",
+        feat_signed: "क्रिप्टोग्राफिक रूप से हस्ताक्षरित संदेश",
+        feat_files: "फ़ाइल एन्क्रिप्शन (अधिकतम 500MB)",
+        feat_qr: "सुरक्षित QR कोड",
+        feat_logs: "एन्क्रिप्टेड लॉग",
+        feat_ai: "एकीकृत एआई",
+        feat_native: "नेटिव विंडोज डेस्कटॉप ऐप",
+        feat_offline: "ऑफ़लाइन काम करता है",
+        feat_local: "सुरक्षित स्थानीय स्टोरेज",
+        feat_auto: "स्वचालित अपडेट",
+        feat_compat: "Windows 10/11 संगत",
+        feat_2fa: "दो-कारक प्रमाणीकरण (TOTP)",
+        feat_gen: "पासवर्ड जनरेटर",
+        feat_cats: "संगठित श्रेणियाँ",
+        feat_lock: "ऑटो-लॉक सुविधा",
+        feat_export: "सुरक्षित निर्यात/आयात",
+        feat_totp: "TOTP कोड जनरेशन",
+        feat_aes_sha: "AES-256 और SHA-256 एन्क्रिप्शन",
+        feat_qr_detect: "स्क्रीनशॉट द्वारा QR डिटेक्शन",
+        feat_tz: "सभी समय क्षेत्र समर्थित",
+        feat_local_enc: "एन्क्रिप्टेड स्थानीय स्टोरेज",
+        feat_langs: "15 भाषाएँ समर्थित",
+        btn_launch: "वेब लॉन्च करें",
+        btn_download: "ZK डाउनलोड करें",
+        btn_archive: "ZKP डाउनलोड करें",
+        btn_download_zkpa: "ZKPA डाउनलोड करें",
+        status_operational: "सभी एप्लिकेशन संचालित हैं",
+        status_encryption: "🔒 एन्क्रिप्शन: AES-256 / RSA-4096",
+        status_apps: "📊 5 एप्लिकेशन उपलब्ध",
+        footer_copyright: "© 2026 Zenkari Suite - सभी अधिकार सुरक्षित",
+        footer_versions: "LE$TER द्वारा बनाया गया | संस्करण: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI सहायक",
+        btn_clear_chat: "🗑 साफ़ करें",
+        btn_export_chat: "💾 निर्यात",
+        btn_theme_chat: "🎨 थीम",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "अपना संदेश टाइप करें...",
+        contact_title: "📧 संपर्क / सहायता",
+        contact_name: "नाम",
+        contact_email: "ईमेल",
+        contact_message: "संदेश"
+    },
+    ar: {
+        title: "قائمة Zenkari",
+        subtitle: "منصة أمان موحدة - اختر تطبيقك",
+        zk_web_title: "ZenkariApp ويب",
+        zk_web_desc: "مراسلة آمنة وتشفير الملفات - إصدار الويب",
+        zk_win_title: "ZenkariApp ويندوز",
+        zk_win_desc: "تطبيق ويندوز أصلي - تنزيل مجاني",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "مدير كلمات المرور مع المصادقة الثنائية - أرشيف",
+        zkp_web_desc: "مدير كلمات المرور مع المصادقة الثنائية - إصدار الويب",
+        zkpa_title: "ZenkariPass للمصادقة",
+        zkpa_desc: "مصادق ثنائي العوامل مع كشف رمز الاستجابة السريعة (بايثون)",
+        feat_rsa: "تشفير RSA-3072 + AES-256",
+        feat_rsa4096: "تشفير RSA-4096 + AES-256",
+        feat_signed: "رسائل موقعة تشفيرياً",
+        feat_files: "تشفير الملفات (500 ميجابايت كحد أقصى)",
+        feat_qr: "رموز استجابة سريعة آمنة",
+        feat_logs: "سجلات مشفرة",
+        feat_ai: "ذكاء اصطناعي مدمج",
+        feat_native: "تطبيق سطح مكتب ويندوز أصلي",
+        feat_offline: "يعمل دون اتصال",
+        feat_local: "تخزين محلي آمن",
+        feat_auto: "تحديثات تلقائية",
+        feat_compat: "متوافق مع ويندوز 10/11",
+        feat_2fa: "المصادقة الثنائية (TOTP)",
+        feat_gen: "مولد كلمات المرور",
+        feat_cats: "فئات منظمة",
+        feat_lock: "ميزة القفل التلقائي",
+        feat_export: "تصدير/استيراد آمن",
+        feat_totp: "توليد رموز TOTP",
+        feat_aes_sha: "تشفير AES-256 و SHA-256",
+        feat_qr_detect: "كشف رمز الاستجابة السريعة عبر لقطة الشاشة",
+        feat_tz: "جميع المناطق الزمنية مدعومة",
+        feat_local_enc: "تخزين محلي مشفر",
+        feat_langs: "15 لغة مدعومة",
+        btn_launch: "تشغيل الويب",
+        btn_download: "تنزيل ZK",
+        btn_archive: "تنزيل ZKP",
+        btn_download_zkpa: "تنزيل ZKPA",
+        status_operational: "جميع التطبيقات قيد التشغيل",
+        status_encryption: "🔒 التشفير: AES-256 / RSA-4096",
+        status_apps: "📊 5 تطبيقات متاحة",
+        footer_copyright: "© 2026 Zenkari Menu - جميع الحقوق محفوظة",
+        footer_versions: "صنع بواسطة LE$TER | الإصدارات: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "مساعد Zenkari AI",
+        btn_clear_chat: "🗑 مسح",
+        btn_export_chat: "💾 تصدير",
+        btn_theme_chat: "🎨 سمة",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "اكتب رسالتك...",
+        contact_title: "📧 اتصال / مساعدة",
+        contact_name: "الاسم",
+        contact_email: "البريد الإلكتروني",
+        contact_message: "الرسالة"
+    },
+    pt: {
+        title: "Menu Zenkari",
+        subtitle: "Plataforma de segurança unificada - Escolha seu aplicativo",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Mensagens seguras e criptografia - Versão Web",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Aplicativo nativo do Windows - Download gratuito",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Gerenciador de senhas com 2FA - Arquivo",
+        zkp_web_desc: "Gerenciador de senhas com 2FA - Versão Web",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "Autenticador 2FA com detecção QR (Python)",
+        feat_rsa: "Criptografia RSA-3072 + AES-256",
+        feat_rsa4096: "Criptografia RSA-4096 + AES-256",
+        feat_signed: "Mensagens assinadas criptograficamente",
+        feat_files: "Criptografia de arquivos (500MB máx)",
+        feat_qr: "Códigos QR seguros",
+        feat_logs: "Logs criptografados",
+        feat_ai: "IA integrada",
+        feat_native: "Aplicativo desktop nativo do Windows",
+        feat_offline: "Funciona offline",
+        feat_local: "Armazenamento local seguro",
+        feat_auto: "Atualizações automáticas",
+        feat_compat: "Compatível com Windows 10/11",
+        feat_2fa: "Autenticação de dois fatores (TOTP)",
+        feat_gen: "Gerador de senhas",
+        feat_cats: "Categorias organizadas",
+        feat_lock: "Bloqueio automático",
+        feat_export: "Exportação/Importação segura",
+        feat_totp: "Geração de códigos TOTP",
+        feat_aes_sha: "Criptografia AES-256 e SHA-256",
+        feat_qr_detect: "Detecção QR via captura de tela",
+        feat_tz: "Todos os fusos horários suportados",
+        feat_local_enc: "Armazenamento local criptografado",
+        feat_langs: "15 idiomas suportados",
+        btn_launch: "Lançar Web",
+        btn_download: "Baixar ZK",
+        btn_archive: "Baixar ZKP",
+        btn_download_zkpa: "Baixar ZKPA",
+        status_operational: "Todos os aplicativos estão operacionais",
+        status_encryption: "🔒 Criptografia: AES-256 / RSA-4096",
+        status_apps: "📊 5 Aplicativos disponíveis",
+        footer_copyright: "© 2026 Zenkari Menu - Todos os direitos reservados",
+        footer_versions: "Feito por LE$TER | Versões: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Assistente IA Zenkari",
+        btn_clear_chat: "🗑 Limpar",
+        btn_export_chat: "💾 Exportar",
+        btn_theme_chat: "🎨 Tema",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Digite sua mensagem...",
+        contact_title: "📧 Contato / Ajuda",
+        contact_name: "Nome",
+        contact_email: "Email",
+        contact_message: "Mensagem"
+    },
+    bn: {
+        title: "Zenkari মেনু",
+        subtitle: "একীভূত নিরাপত্তা প্ল্যাটফর্ম - আপনার অ্যাপ্লিকেশন চয়ন করুন",
+        zk_web_title: "ZenkariApp ওয়েব",
+        zk_web_desc: "নিরাপদ বার্তা ও এনক্রিপশন - ওয়েব সংস্করণ",
+        zk_win_title: "ZenkariApp উইন্ডোজ",
+        zk_win_desc: "নেটিভ উইন্ডোজ অ্যাপ্লিকেশন - বিনামূল্যে ডাউনলোড",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "2FA সহ পাসওয়ার্ড ম্যানেজার - আর্কাইভ",
+        zkp_web_desc: "2FA সহ পাসওয়ার্ড ম্যানেজার - ওয়েব সংস্করণ",
+        zkpa_title: "ZenkariPass অথেন্টিকেটর",
+        zkpa_desc: "QR ডিটেকশন সহ 2FA অথেন্টিকেটর (Python)",
+        feat_rsa: "RSA-3072 + AES-256 এনক্রিপশন",
+        feat_rsa4096: "RSA-4096 + AES-256 এনক্রিপশন",
+        feat_signed: "ক্রিপ্টোগ্রাফিকভাবে স্বাক্ষরিত বার্তা",
+        feat_files: "ফাইল এনক্রিপশন (সর্বোচ্চ 500MB)",
+        feat_qr: "নিরাপদ QR কোড",
+        feat_logs: "এনক্রিপ্টেড লগ",
+        feat_ai: "একীভূত এআই",
+        feat_native: "নেটিভ উইন্ডোজ ডেস্কটপ অ্যাপ",
+        feat_offline: "অফলাইনে কাজ করে",
+        feat_local: "নিরাপদ লোকাল স্টোরেজ",
+        feat_auto: "স্বয়ংক্রিয় আপডেট",
+        feat_compat: "Windows 10/11 সামঞ্জস্যপূর্ণ",
+        feat_2fa: "দুই-ফ্যাক্টর প্রমাণীকরণ (TOTP)",
+        feat_gen: "পাসওয়ার্ড জেনারেটর",
+        feat_cats: "সংগঠিত বিভাগ",
+        feat_lock: "অটো-লক ফিচার",
+        feat_export: "নিরাপদ এক্সপোর্ট/ইম্পোর্ট",
+        feat_totp: "TOTP কোড জেনারেশন",
+        feat_aes_sha: "AES-256 এবং SHA-256 এনক্রিপশন",
+        feat_qr_detect: "স্ক্রিনশটের মাধ্যমে QR ডিটেকশন",
+        feat_tz: "সমস্ত সময় অঞ্চল সমর্থিত",
+        feat_local_enc: "এনক্রিপ্টেড লোকাল স্টোরেজ",
+        feat_langs: "15টি ভাষা সমর্থিত",
+        btn_launch: "ওয়েব চালু করুন",
+        btn_download: "ZK ডাউনলোড করুন",
+        btn_archive: "ZKP ডাউনলোড করুন",
+        btn_download_zkpa: "ZKPA ডাউনলোড করুন",
+        status_operational: "সমস্ত অ্যাপ্লিকেশন সক্রিয়",
+        status_encryption: "🔒 এনক্রিপশন: AES-256 / RSA-4096",
+        status_apps: "📊 5টি অ্যাপ্লিকেশন উপলব্ধ",
+        footer_copyright: "© 2026 Zenkari Menu - সর্বস্বত্ব সংরক্ষিত",
+        footer_versions: "LE$TER দ্বারা তৈরি | সংস্করণ: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI সহায়ক",
+        btn_clear_chat: "🗑 পরিষ্কার করুন",
+        btn_export_chat: "💾 এক্সপোর্ট",
+        btn_theme_chat: "🎨 থিম",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "আপনার বার্তা টাইপ করুন...",
+        contact_title: "📧 যোগাযোগ / সাহায্য",
+        contact_name: "নাম",
+        contact_email: "ইমেল",
+        contact_message: "বার্তা"
+    },
+    ru: {
+        title: "Меню Zenkari",
+        subtitle: "Единая платформа безопасности - Выберите приложение",
+        zk_web_title: "ZenkariApp Веб",
+        zk_web_desc: "Безопасные сообщения и шифрование - Веб-версия",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Нативное приложение Windows - Бесплатная загрузка",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Менеджер паролей с 2FA - Архив",
+        zkp_web_desc: "Менеджер паролей с 2FA - Веб-версия",
+        zkpa_title: "ZenkariPass Аутентификатор",
+        zkpa_desc: "2FA аутентификатор с обнаружением QR (Python)",
+        feat_rsa: "Шифрование RSA-3072 + AES-256",
+        feat_rsa4096: "Шифрование RSA-4096 + AES-256",
+        feat_signed: "Криптографически подписанные сообщения",
+        feat_files: "Шифрование файлов (макс. 500МБ)",
+        feat_qr: "Безопасные QR-коды",
+        feat_logs: "Зашифрованные журналы",
+        feat_ai: "Интегрированный ИИ",
+        feat_native: "Нативное десктопное приложение Windows",
+        feat_offline: "Работает офлайн",
+        feat_local: "Безопасное локальное хранилище",
+        feat_auto: "Автоматические обновления",
+        feat_compat: "Совместимо с Windows 10/11",
+        feat_2fa: "Двухфакторная аутентификация (TOTP)",
+        feat_gen: "Генератор паролей",
+        feat_cats: "Организованные категории",
+        feat_lock: "Автоматическая блокировка",
+        feat_export: "Безопасный экспорт/импорт",
+        feat_totp: "Генерация кодов TOTP",
+        feat_aes_sha: "Шифрование AES-256 и SHA-256",
+        feat_qr_detect: "Обнаружение QR через скриншот",
+        feat_tz: "Поддержка всех часовых поясов",
+        feat_local_enc: "Зашифрованное локальное хранилище",
+        feat_langs: "Поддержка 15 языков",
+        btn_launch: "Запустить Веб",
+        btn_download: "Скачать ZK",
+        btn_archive: "Скачать ZKP",
+        btn_download_zkpa: "Скачать ZKPA",
+        status_operational: "Все приложения работают",
+        status_encryption: "🔒 Шифрование: AES-256 / RSA-4096",
+        status_apps: "📊 5 приложений доступно",
+        footer_copyright: "© 2026 Zenkari Menu - Все права защищены",
+        footer_versions: "Сделано LE$TER | Версии: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI Ассистент",
+        btn_clear_chat: "🗑 Очистить",
+        btn_export_chat: "💾 Экспорт",
+        btn_theme_chat: "🎨 Тема",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Введите ваше сообщение...",
+        contact_title: "📧 Контакт / Помощь",
+        contact_name: "Имя",
+        contact_email: "Email",
+        contact_message: "Сообщение"
+    },
+    ja: {
+        title: "Zenkari メニュー",
+        subtitle: "統合セキュリティプラットフォーム - アプリケーションを選択",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "安全なメッセージと暗号化 - Web 版",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "ネイティブ Windows アプリ - 無料ダウンロード",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "2FA 対応パスワードマネージャー - アーカイブ",
+        zkp_web_desc: "2FA 対応パスワードマネージャー - Web 版",
+        zkpa_title: "ZenkariPass 認証アプリ",
+        zkpa_desc: "QR 検出対応 2FA 認証アプリ (Python)",
+        feat_rsa: "RSA-3072 + AES-256 暗号化",
+        feat_rsa4096: "RSA-4096 + AES-256 暗号化",
+        feat_signed: "暗号署名されたメッセージ",
+        feat_files: "ファイル暗号化 (最大 500MB)",
+        feat_qr: "安全な QR コード",
+        feat_logs: "暗号化ログ",
+        feat_ai: "統合 AI",
+        feat_native: "ネイティブ Windows デスクトップアプリ",
+        feat_offline: "オフライン動作",
+        feat_local: "安全なローカルストレージ",
+        feat_auto: "自動アップデート",
+        feat_compat: "Windows 10/11 対応",
+        feat_2fa: "二要素認証 (TOTP)",
+        feat_gen: "パスワード生成器",
+        feat_cats: "整理されたカテゴリ",
+        feat_lock: "自動ロック機能",
+        feat_export: "安全なエクスポート/インポート",
+        feat_totp: "TOTP コード生成",
+        feat_aes_sha: "AES-256 と SHA-256 暗号化",
+        feat_qr_detect: "スクリーンショットによる QR 検出",
+        feat_tz: "全タイムゾーン対応",
+        feat_local_enc: "暗号化ローカルストレージ",
+        feat_langs: "15 言語対応",
+        btn_launch: "Web を起動",
+        btn_download: "ZK をダウンロード",
+        btn_archive: "ZKP をダウンロード",
+        btn_download_zkpa: "ZKPA をダウンロード",
+        status_operational: "すべてのアプリケーションが稼働中",
+        status_encryption: "🔒 暗号化：AES-256 / RSA-4096",
+        status_apps: "📊 5 つのアプリケーションが利用可能",
+        footer_copyright: "© 2026 Zenkari Menu - 全著作権所有",
+        footer_versions: "LE$TER 制作 | バージョン：ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI アシスタント",
+        btn_clear_chat: "🗑 クリア",
+        btn_export_chat: "💾 エクスポート",
+        btn_theme_chat: "🎨 テーマ",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "メッセージを入力...",
+        contact_title: "📧 お問い合わせ/ヘルプ",
+        contact_name: "名前",
+        contact_email: "メール",
+        contact_message: "メッセージ"
+    },
+    de: {
+        title: "Zenkari Menü",
+        subtitle: "Einheitliche Sicherheitsplattform - Wählen Sie Ihre Anwendung",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Sichere Nachrichten & Verschlüsselung - Web-Version",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Native Windows-Anwendung - Kostenloser Download",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Passwort-Manager mit 2FA - Archiv",
+        zkp_web_desc: "Passwort-Manager mit 2FA - Web-Version",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "2FA-Authenticator mit QR-Erkennung (Python)",
+        feat_rsa: "RSA-3072 + AES-256 Verschlüsselung",
+        feat_rsa4096: "RSA-4096 + AES-256 Verschlüsselung",
+        feat_signed: "Kryptografisch signierte Nachrichten",
+        feat_files: "Dateiverschlüsselung (max. 500MB)",
+        feat_qr: "Sichere QR-Codes",
+        feat_logs: "Verschlüsselte Logs",
+        feat_ai: "Integrierte KI",
+        feat_native: "Native Windows-Desktop-App",
+        feat_offline: "Funktioniert offline",
+        feat_local: "Sicherer lokaler Speicher",
+        feat_auto: "Automatische Updates",
+        feat_compat: "Kompatibel mit Windows 10/11",
+        feat_2fa: "Zwei-Faktor-Authentifizierung (TOTP)",
+        feat_gen: "Passwort-Generator",
+        feat_cats: "Organisierte Kategorien",
+        feat_lock: "Automatische Sperre",
+        feat_export: "Sicherer Export/Import",
+        feat_totp: "TOTP-Code-Generierung",
+        feat_aes_sha: "AES-256 & SHA-256 Verschlüsselung",
+        feat_qr_detect: "QR-Erkennung per Screenshot",
+        feat_tz: "Alle Zeitzonen unterstützt",
+        feat_local_enc: "Verschlüsselter lokaler Speicher",
+        feat_langs: "15 Sprachen unterstützt",
+        btn_launch: "Web starten",
+        btn_download: "ZK herunterladen",
+        btn_archive: "ZKP herunterladen",
+        btn_download_zkpa: "ZKPA herunterladen",
+        status_operational: "Alle Anwendungen sind betriebsbereit",
+        status_encryption: "🔒 Verschlüsselung: AES-256 / RSA-4096",
+        status_apps: "📊 5 Anwendungen verfügbar",
+        footer_copyright: "© 2026 Zenkari Menu - Alle Rechte vorbehalten",
+        footer_versions: "Erstellt von LE$TER | Versionen: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari KI-Assistent",
+        btn_clear_chat: "🗑 Löschen",
+        btn_export_chat: "💾 Exportieren",
+        btn_theme_chat: "🎨 Thema",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Nachricht eingeben...",
+        contact_title: "📧 Kontakt / Hilfe",
+        contact_name: "Name",
+        contact_email: "E-Mail",
+        contact_message: "Nachricht"
+    },
+    it: {
+        title: "Menu Zenkari",
+        subtitle: "Piattaforma di sicurezza unificata - Scegli la tua applicazione",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Messaggistica sicura e crittografia - Versione Web",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Applicazione nativa Windows - Download gratuito",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Gestore password con 2FA - Archivio",
+        zkp_web_desc: "Gestore password con 2FA - Versione Web",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "Autenticatore 2FA con rilevamento QR (Python)",
+        feat_rsa: "Crittografia RSA-3072 + AES-256",
+        feat_rsa4096: "Crittografia RSA-4096 + AES-256",
+        feat_signed: "Messaggi firmati crittograficamente",
+        feat_files: "Crittografia file (max 500MB)",
+        feat_qr: "Codici QR sicuri",
+        feat_logs: "Log crittografati",
+        feat_ai: "IA integrata",
+        feat_native: "App desktop nativa Windows",
+        feat_offline: "Funziona offline",
+        feat_local: "Archiviazione locale sicura",
+        feat_auto: "Aggiornamenti automatici",
+        feat_compat: "Compatibile con Windows 10/11",
+        feat_2fa: "Autenticazione a due fattori (TOTP)",
+        feat_gen: "Generatore di password",
+        feat_cats: "Categorie organizzate",
+        feat_lock: "Blocco automatico",
+        feat_export: "Esportazione/Importazione sicura",
+        feat_totp: "Generazione codici TOTP",
+        feat_aes_sha: "Crittografia AES-256 e SHA-256",
+        feat_qr_detect: "Rilevamento QR tramite screenshot",
+        feat_tz: "Tutti i fusi orari supportati",
+        feat_local_enc: "Archiviazione locale crittografata",
+        feat_langs: "15 lingue supportate",
+        btn_launch: "Avvia Web",
+        btn_download: "Scarica ZK",
+        btn_archive: "Scarica ZKP",
+        btn_download_zkpa: "Scarica ZKPA",
+        status_operational: "Tutte le applicazioni sono operative",
+        status_encryption: "🔒 Crittografia: AES-256 / RSA-4096",
+        status_apps: "📊 5 Applicazioni disponibili",
+        footer_copyright: "© 2026 Zenkari Menu - Tutti i diritti riservati",
+        footer_versions: "Creato da LE$TER | Versioni: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Assistente IA Zenkari",
+        btn_clear_chat: "🗑 Cancella",
+        btn_export_chat: "💾 Esporta",
+        btn_theme_chat: "🎨 Tema",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Digita il tuo messaggio...",
+        contact_title: "📧 Contatto / Aiuto",
+        contact_name: "Nome",
+        contact_email: "Email",
+        contact_message: "Messaggio"
+    },
+    vi: {
+        title: "Menu Zenkari",
+        subtitle: "Nền tảng bảo mật thống nhất - Chọn ứng dụng của bạn",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Nhắn tin an toàn & mã hóa - Phiên bản Web",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Ứng dụng Windows gốc - Tải miễn phí",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "Quản lý mật khẩu với 2FA - Lưu trữ",
+        zkp_web_desc: "Quản lý mật khẩu với 2FA - Phiên bản Web",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "Xác thực 2FA với phát hiện QR (Python)",
+        feat_rsa: "Mã hóa RSA-3072 + AES-256",
+        feat_rsa4096: "Mã hóa RSA-4096 + AES-256",
+        feat_signed: "Tin nhắn được ký mã hóa",
+        feat_files: "Mã hóa tệp (tối đa 500MB)",
+        feat_qr: "Mã QR an toàn",
+        feat_logs: "Nhật ký mã hóa",
+        feat_ai: "AI tích hợp",
+        feat_native: "Ứng dụng desktop Windows gốc",
+        feat_offline: "Hoạt động ngoại tuyến",
+        feat_local: "Lưu trữ cục bộ an toàn",
+        feat_auto: "Cập nhật tự động",
+        feat_compat: "Tương thích Windows 10/11",
+        feat_2fa: "Xác thực hai yếu tố (TOTP)",
+        feat_gen: "Trình tạo mật khẩu",
+        feat_cats: "Danh mục được tổ chức",
+        feat_lock: "Tính năng khóa tự động",
+        feat_export: "Xuất/Nhập an toàn",
+        feat_totp: "Tạo mã TOTP",
+        feat_aes_sha: "Mã hóa AES-256 và SHA-256",
+        feat_qr_detect: "Phát hiện QR qua ảnh chụp",
+        feat_tz: "Hỗ trợ tất cả múi giờ",
+        feat_local_enc: "Lưu trữ cục bộ mã hóa",
+        feat_langs: "Hỗ trợ 15 ngôn ngữ",
+        btn_launch: "Chạy Web",
+        btn_download: "Tải ZK",
+        btn_archive: "Tải ZKP",
+        btn_download_zkpa: "Tải ZKPA",
+        status_operational: "Tất cả ứng dụng đang hoạt động",
+        status_encryption: "🔒 Mã hóa: AES-256 / RSA-4096",
+        status_apps: "📊 5 Ứng dụng có sẵn",
+        footer_copyright: "© 2026 Zenkari Menu - Bảo lưu mọi quyền",
+        footer_versions: "Tạo bởi LE$TER | Phiên bản: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Trợ lý AI Zenkari",
+        btn_clear_chat: "🗑 Xóa",
+        btn_export_chat: "💾 Xuất",
+        btn_theme_chat: "🎨 Chủ Đề",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Nhập tin nhắn của bạn...",
+        contact_title: "📧 Liên Hệ / Trợ Giúp",
+        contact_name: "Tên",
+        contact_email: "Email",
+        contact_message: "Tin nhắn"
+    },
+    ko: {
+        title: "Zenkari 메뉴",
+        subtitle: "통합 보안 플랫폼 - 애플리케이션 선택",
+        zk_web_title: "ZenkariApp 웹",
+        zk_web_desc: "안전한 메시징 및 암호화 - 웹 버전",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "네이티브 Windows 앱 - 무료 다운로드",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "2FA 지원 비밀번호 관리자 - 아카이브",
+        zkp_web_desc: "2FA 지원 비밀번호 관리자 - 웹 버전",
+        zkpa_title: "ZenkariPass 인증기",
+        zkpa_desc: "QR 감지 지원 2FA 인증기 (Python)",
+        feat_rsa: "RSA-3072 + AES-256 암호화",
+        feat_rsa4096: "RSA-4096 + AES-256 암호화",
+        feat_signed: "암호화 서명된 메시지",
+        feat_files: "파일 암호화 (최대 500MB)",
+        feat_qr: "안전한 QR 코드",
+        feat_logs: "암호화된 로그",
+        feat_ai: "통합 AI",
+        feat_native: "네이티브 Windows 데스크톱 앱",
+        feat_offline: "오프라인 작동",
+        feat_local: "안전한 로컬 저장소",
+        feat_auto: "자동 업데이트",
+        feat_compat: "Windows 10/11 호환",
+        feat_2fa: "이중 인증 (TOTP)",
+        feat_gen: "비밀번호 생성기",
+        feat_cats: "정리된 카테고리",
+        feat_lock: "자동 잠금 기능",
+        feat_export: "안전한 내보내기/가져오기",
+        feat_totp: "TOTP 코드 생성",
+        feat_aes_sha: "AES-256 및 SHA-256 암호화",
+        feat_qr_detect: "스크린샷을 통한 QR 감지",
+        feat_tz: "모든 시간대 지원",
+        feat_local_enc: "암호화된 로컬 저장소",
+        feat_langs: "15 개 언어 지원",
+        btn_launch: "웹 실행",
+        btn_download: "ZK 다운로드",
+        btn_archive: "ZKP 다운로드",
+        btn_download_zkpa: "ZKPA 다운로드",
+        status_operational: "모든 애플리케이션이 작동 중",
+        status_encryption: "🔒 암호화：AES-256 / RSA-4096",
+        status_apps: "📊 5 개 애플리케이션 사용 가능",
+        footer_copyright: "© 2026 Zenkari Menu - 모든 권리 보유",
+        footer_versions: "LE$TER 제작 | 버전: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI 도우미",
+        btn_clear_chat: "🗑 지우기",
+        btn_export_chat: "💾 내보내기",
+        btn_theme_chat: "🎨 테마",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "메시지 입력...",
+        contact_title: "📧 연락처 / 도움말",
+        contact_name: "이름",
+        contact_email: "이메일",
+        contact_message: "메시지"
+    },
+    tr: {
+        title: "Zenkari Menüsü",
+        subtitle: "Birleşik güvenlik platformu - Uygulamanızı seçin",
+        zk_web_title: "ZenkariApp Web",
+        zk_web_desc: "Güvenli mesajlaşma ve şifreleme - Web Sürümü",
+        zk_win_title: "ZenkariApp Windows",
+        zk_win_desc: "Yerel Windows uygulaması - Ücretsiz indirme",
+        zkp_title: "ZenkariPass",
+        zkp_archive_desc: "2FA'lı parola yöneticisi - Arşiv",
+        zkp_web_desc: "2FA'lı parola yöneticisi - Web Sürümü",
+        zkpa_title: "ZenkariPass Authenticator",
+        zkpa_desc: "QR algılama özellikli 2FA doğrulayıcı (Python)",
+        feat_rsa: "RSA-3072 + AES-256 Şifreleme",
+        feat_rsa4096: "RSA-4096 + AES-256 Şifreleme",
+        feat_signed: "Kriptografik olarak imzalı mesajlar",
+        feat_files: "Dosya şifreleme (maks. 500MB)",
+        feat_qr: "Güvenli QR Kodları",
+        feat_logs: "Şifreli günlükler",
+        feat_ai: "Entegre Yapay Zeka",
+        feat_native: "Yerel Windows masaüstü uygulaması",
+        feat_offline: "Çevrimdışı çalışır",
+        feat_local: "Güvenli yerel depolama",
+        feat_auto: "Otomatik güncellemeler",
+        feat_compat: "Windows 10/11 uyumlu",
+        feat_2fa: "İki faktörlü kimlik doğrulama (TOTP)",
+        feat_gen: "Parola oluşturucu",
+        feat_cats: "Düzenlenmiş kategoriler",
+        feat_lock: "Otomatik kilitleme",
+        feat_export: "Güvenli dışa/içe aktarma",
+        feat_totp: "TOTP kodu oluşturma",
+        feat_aes_sha: "AES-256 ve SHA-256 şifreleme",
+        feat_qr_detect: "Ekran görüntüsü ile QR algılama",
+        feat_tz: "Tüm zaman dilimleri desteklenir",
+        feat_local_enc: "Şifreli yerel depolama",
+        feat_langs: "15 dil desteklenir",
+        btn_launch: "Web'i Başlat",
+        btn_download: "ZK İndir",
+        btn_archive: "ZKP İndir",
+        btn_download_zkpa: "ZKPA İndir",
+        status_operational: "Tüm uygulamalar çalışır durumda",
+        status_encryption: "🔒 Şifreleme: AES-256 / RSA-4096",
+        status_apps: "📊 5 Uygulama mevcut",
+        footer_copyright: "© 2026 Zenkari Menu - Tüm hakları saklıdır",
+        footer_versions: "LE$TER tarafından yapıldı | Sürümler: ZK 10.0.0F | ZK 9.8.9 | ZKP 9.8.5 | ZKPA 4.0.0",
+        ai_chat_title: "Zenkari AI Asistanı",
+        btn_clear_chat: "🗑 Temizle",
+        btn_export_chat: "💾 Dışa Aktar",
+        btn_theme_chat: "🎨 Tema",
+        ai_thinking: "Tecuit...",
+        chat_placeholder: "Mesajınızı yazın...",
+        contact_title: "📧 İletişim / Yardım",
+        contact_name: "İsim",
+        contact_email: "E-posta",
+        contact_message: "Mesaj"
+    }
+};
+
+// Language codes for indicator
+const langCodes = {
+    en: '🇬🇧 EN',
+    fr: '🇫🇷 FR',
+    es: '🇪🇸 ES',
+    zh: '🇨🇳 ZH',
+    hi: '🇮🇳 HI',
+    ar: '🇸🇦 AR',
+    pt: '🇵🇹 PT',
+    bn: '🇧🇩 BN',
+    ru: '🇷🇺 RU',
+    ja: '🇯🇵 JA',
+    de: '🇩🇪 DE',
+    it: '🇮🇹 IT',
+    vi: '🇻🇳 VI',
+    ko: '🇰🇷 KO',
+    tr: '🇹🇷 TR'
+};
+
+// ==================== LANGUAGE FUNCTIONS ====================
+let currentLang = 'fr';
+let conversationHistory = [];
+let isGenerating = false;
+let abortController = null;
+
+function changeLanguage() {
+    const lang = document.getElementById('languageSelector').value;
+    currentLang = lang;
+    
+    // Update all translatable elements
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            element.textContent = translations[lang][key];
+        }
+    });
+    
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translations[lang] && translations[lang][key]) {
+            element.placeholder = translations[lang][key];
+        }
+    });
+    
+    // Update language indicator
+    document.getElementById('langIndicator').textContent = langCodes[lang] || lang.toUpperCase();
+    
+    // Save preference
+    localStorage.setItem('zenkari_lang', lang);
+    
+    // Show notification
+    showLangNotification(lang);
+}
+
+function showLangNotification(lang) {
+    const indicator = document.getElementById('langIndicator');
+    indicator.style.animation = 'none';
+    indicator.offsetHeight;
+    indicator.style.animation = 'pulse 2s infinite';
+}
+
+function initLanguage() {
+    const savedLang = localStorage.getItem('zenkari_lang');
+    if (savedLang && translations[savedLang]) {
+        currentLang = savedLang;
+        document.getElementById('languageSelector').value = savedLang;
+    } else {
+        const browserLang = navigator.language.split('-')[0];
+        if (translations[browserLang]) {
+            currentLang = browserLang;
+            document.getElementById('languageSelector').value = browserLang;
+        }
+    }
+    changeLanguage();
+}
+
+function handleContactForm(e) {
+    e.preventDefault();
+    const name = document.getElementById('contactName').value;
+    const email = document.getElementById('contactEmail').value;
+    const message = document.getElementById('contactMessage').value;
+    const mailtoLink = `mailto:ZenkariWebService@protonmail.com?subject=Contact depuis ZenkariApp - ${encodeURIComponent(name)}&body=Nom: ${encodeURIComponent(name)}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
+    window.location.href = mailtoLink;
+    alert('Thank you for your message! An email has been prepared.');
+    e.target.reset();
+}
+
+// ==================== AI CHAT FUNCTIONS ====================
+function initChat() {
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('sendBtn');
+    const fileUploadBtn = document.getElementById('fileUploadBtn');
+    const tecuitThinking = document.getElementById('tecuit-thinking');
+    const stopGenBtn = document.getElementById('stopGenBtn');
+    
+    function addMessage(text, from) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + from;
+        div.textContent = text;
+        div.id = 'msg_' + Date.now();
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+        return div.id;
+    }
+    
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
         
-        <!-- Login Form -->
-        <div id="login-form" class="auth-card rounded-2xl p-8 w-full max-w-md relative z-10 animate-fade-in">
-            <div class="text-center mb-8">
-                <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-tecuit-accent/30">
-                <h1 class="text-2xl font-bold mb-2">Bienvenue sur <span class="gradient-text">Tecuit IA</span></h1>
-                <p class="text-tecuit-subtext text-sm">Connectez-vous pour accéder à vos conversations</p>
-            </div>
-
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-tecuit-subtext mb-2">Email</label>
-                    <input type="email" id="login-email" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-tecuit-subtext focus:outline-none" placeholder="votre@email.com" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-tecuit-subtext mb-2">Mot de passe</label>
-                    <div class="relative">
-                        <input type="password" id="login-password" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-tecuit-subtext focus:outline-none pr-12" placeholder="••••••••" required>
-                        <button type="button" onclick="togglePassword('login-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-tecuit-subtext hover:text-white">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-tecuit-accent hover:bg-tecuit-accentHover text-white py-3 rounded-xl font-medium transition-all glow-effect">
-                    Se connecter
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <p class="text-tecuit-subtext text-sm">
-                    Pas encore de compte ? 
-                    <button onclick="showRegister()" class="text-tecuit-accent hover:underline">S'inscrire</button>
-                </p>
-            </div>
-
-            <div class="mt-4 text-center">
-                <p class="text-[10px] text-tecuit-subtext">
-                    <i class="fa-solid fa-lock mr-1"></i> Vos données sont cryptées en AES-256
-                </p>
-            </div>
-        </div>
-
-        <!-- Register Form -->
-        <div id="register-form" class="auth-card rounded-2xl p-8 w-full max-w-md relative z-10 hidden animate-fade-in">
-            <div class="text-center mb-8">
-                <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-tecuit-accent/30">
-                <h1 class="text-2xl font-bold mb-2">Créer un compte</h1>
-                <p class="text-tecuit-subtext text-sm">Rejoignez Tecuit IA gratuitement</p>
-            </div>
-
-            <form id="registerForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-tecuit-subtext mb-2">Nom d'utilisateur</label>
-                    <input type="text" id="register-username" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-tecuit-subtext focus:outline-none" placeholder="Votre nom" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-tecuit-subtext mb-2">Email</label>
-                    <input type="email" id="register-email" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-tecuit-subtext focus:outline-none" placeholder="votre@email.com" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-tecuit-subtext mb-2">Mot de passe</label>
-                    <div class="relative">
-                        <input type="password" id="register-password" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-tecuit-subtext focus:outline-none pr-12" placeholder="••••••••" minlength="6" required>
-                        <button type="button" onclick="togglePassword('register-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-tecuit-subtext hover:text-white">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-tecuit-subtext mt-1">Minimum 6 caractères</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-tecuit-subtext mb-2">Confirmer le mot de passe</label>
-                    <div class="relative">
-                        <input type="password" id="register-confirm" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-tecuit-subtext focus:outline-none pr-12" placeholder="••••••••" required>
-                        <button type="button" onclick="togglePassword('register-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-tecuit-subtext hover:text-white">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-tecuit-accent hover:bg-tecuit-accentHover text-white py-3 rounded-xl font-medium transition-all glow-effect">
-                    S'inscrire
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <p class="text-tecuit-subtext text-sm">
-                    Déjà un compte ? 
-                    <button onclick="showLogin()" class="text-tecuit-accent hover:underline">Se connecter</button>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== MAIN APPLICATION ==================== -->
-    <div id="main-app" class="h-screen flex flex-col">
-        <!-- Header -->
-        <header class="flex items-center justify-between px-4 py-3 bg-tecuit-dark/95 backdrop-blur-md border-b border-tecuit-border z-30 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <button id="sidebarBtn" class="text-tecuit-subtext hover:text-white transition-colors p-2">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <div class="flex items-center gap-2">
-                    <img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" alt="Tecuit Logo" class="w-8 h-8 rounded-full object-cover border border-tecuit-accent/30">
-                    <h1 class="font-semibold text-lg tracking-tight">Tecuit</h1>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="modelBtn" class="flex items-center gap-2 bg-tecuit-card px-3 py-1.5 rounded-full border border-tecuit-border hover:border-tecuit-accent/50 transition-all">
-                    <span class="text-xs font-medium text-tecuit-subtext" id="current-model-display">Hermes 4B</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-tecuit-subtext"></i>
-                </button>
-                <button id="newChatBtn" class="text-tecuit-subtext hover:text-white p-2" title="Nouvelle conversation">
-                    <i class="fa-regular fa-pen-to-square text-lg"></i>
-                </button>
-                <button id="menuBtn" class="text-tecuit-subtext hover:text-white p-2">
-                    <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- Sidebar -->
-        <div id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-tecuit-card border-r border-tecuit-border transform -translate-x-full transition-transform duration-300 z-40">
-            <div class="p-4 h-full flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-semibold text-lg">Conversations</h2>
-                    <button id="closeSidebarBtn" class="text-tecuit-subtext hover:text-white">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-                
-                <button id="newConversationBtn" class="w-full bg-tecuit-accent hover:bg-tecuit-accentHover text-white py-3 rounded-xl mb-4 flex items-center justify-center gap-2 transition-colors">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Nouvelle conversation</span>
-                </button>
-
-                <div class="flex-1 overflow-y-auto">
-                    <div class="text-xs text-tecuit-subtext mb-2">Aujourd'hui</div>
-                    <div id="conversation-list" class="space-y-2">
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-tecuit-border">
-                    <div class="flex items-center gap-3 p-3 rounded-xl bg-tecuit-dark/50 mb-2">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-tecuit-accent to-purple-500 flex items-center justify-center">
-                            <span id="user-initial" class="font-bold text-sm">U</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div id="user-name-display" class="font-medium text-sm truncate">Utilisateur</div>
-                            <div class="text-xs text-tecuit-subtext" id="memory-display">3.5GB / 10GB utilisé</div>
-                        </div>
-                    </div>
-                    <button id="logoutBtn" class="w-full text-left p-3 rounded-xl hover:bg-tecuit-dark/50 transition-colors text-tecuit-subtext hover:text-red-400 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-sign-out-alt"></i>
-                        <span>Déconnexion</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Area -->
-        <main id="chat-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-        </main>
-
-        <!-- Input Area -->
-        <div class="p-4 bg-tecuit-dark border-t border-tecuit-border z-30 flex-shrink-0">
-            
-            <!-- File Upload Progress -->
-            <div id="fileProgressContainer" class="hidden mb-2">
-                <div class="file-progress">
-                    <div class="flex items-center justify-between mb-2">
-                        <span id="fileProgressName" class="text-xs text-tecuit-subtext">Traitement du fichier...</span>
-                        <span id="fileProgressPercent" class="text-xs text-tecuit-accent">0%</span>
-                    </div>
-                    <div class="w-full bg-tecuit-border rounded-full h-1">
-                        <div id="fileProgressBar" class="file-progress-bar" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="typingPreview" class="hidden mb-2 px-2 text-xs text-tecuit-subtext italic truncate"></div>
-
-            <div id="stopButtonContainer" class="hidden mb-2 flex justify-center">
-                <button id="stopGenBtn" class="bg-tecuit-card border border-tecuit-border text-white text-sm px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 hover:bg-red-900/30 hover:border-red-500/50 transition-all glow-effect">
-                    <i class="fa-solid fa-stop text-red-400"></i>
-                    <span>Arrêter la génération</span>
-                </button>
-            </div>
-
-            <div class="flex items-end gap-2 bg-tecuit-card border border-tecuit-border rounded-2xl p-2 shadow-lg">
-                <button id="attachBtn" class="p-3 text-tecuit-accent hover:bg-tecuit-border/50 rounded-xl transition-colors flex-shrink-0" title="Plus d'options">
-                    <i class="fa-solid fa-plus text-lg"></i>
-                </button>
-
-                <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-white placeholder-tecuit-subtext focus:outline-none resize-none py-3 max-h-32" placeholder="Message Tecuit..."></textarea>
-                
-                <button id="sendBtn" class="p-3 bg-tecuit-accent text-white rounded-xl hover:bg-tecuit-accentHover transition-colors flex-shrink-0 shadow-md shadow-indigo-500/20">
-                    <i class="fa-solid fa-arrow-up text-sm"></i>
-                </button>
-            </div>
-            <div class="text-center mt-2">
-                <p class="text-[10px] text-tecuit-subtext">Tecuit IA peut faire des erreurs. Vérifiez les informations importantes.</p>
-            </div>
-        </div>
-
-        <!-- Hidden File Input -->
-        <input type="file" id="fileInput" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt,.md,.json,.csv">
-
-        <!-- Bottom Sheet (Features Menu) -->
-        <div id="bottom-sheet" class="fixed inset-0 z-50 pointer-events-none">
-            <div id="sheet-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
-            <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-tecuit-card border-t border-tecuit-border rounded-t-3xl transform translate-y-full transition-transform duration-300 pointer-events-auto max-h-[85vh] flex flex-col">
-                <div class="p-4 pb-2 overflow-y-auto">
-                    <div class="sheet-handle"></div>
-                    <h3 class="text-center font-semibold text-lg mb-4">Options Tecuit</h3>
-                    
-                    <div class="grid grid-cols-3 gap-3 mb-6">
-                        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('camera')">
-                            <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
-                                <i class="fa-solid fa-camera text-xl"></i>
-                            </div>
-                            <span class="text-xs font-medium">Caméra</span>
-                        </button>
-                        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('photos')">
-                            <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
-                                <i class="fa-regular fa-image text-xl"></i>
-                            </div>
-                            <span class="text-xs font-medium">Photos</span>
-                        </button>
-                        <button class="feature-item flex flex-col items-center justify-center gap-2 p-4 bg-tecuit-dark/50 rounded-2xl border border-tecuit-border hover:border-tecuit-accent/50 transition-all" onclick="triggerFileUpload('files')">
-                            <div class="w-12 h-12 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
-                                <i class="fa-solid fa-paperclip text-xl"></i>
-                            </div>
-                            <span class="text-xs font-medium">Fichiers</span>
-                        </button>
-                    </div>
-
-                    <div class="h-px bg-tecuit-border w-full mb-4"></div>
-
-                    <div class="flex flex-col gap-1 pb-6">
-                        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Créer une image')">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20">
-                                <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
-                            </div>
-                            <div class="text-left flex-1">
-                                <h4 class="font-medium text-sm">Créer une image</h4>
-                                <p class="text-xs text-tecuit-subtext">Visualisez n'importe quoi</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
-                        </button>
-
-                        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Raisonnement avancé')">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-amber-400 border border-amber-500/20">
-                                <i class="fa-regular fa-lightbulb text-lg"></i>
-                            </div>
-                            <div class="text-left flex-1">
-                                <h4 class="font-medium text-sm">Raisonnement avancé</h4>
-                                <p class="text-xs text-tecuit-subtext">Réfléchir plus longtemps</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
-                        </button>
-
-                        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche approfondie')">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
-                                <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
-                            </div>
-                            <div class="text-left flex-1">
-                                <h4 class="font-medium text-sm">Recherche approfondie</h4>
-                                <p class="text-xs text-tecuit-subtext">Rapports détaillés</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
-                        </button>
-
-                        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Recherche sur Internet')">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                                <i class="fa-solid fa-globe text-lg"></i>
-                            </div>
-                            <div class="text-left flex-1">
-                                <h4 class="font-medium text-sm">Recherche sur Internet</h4>
-                                <p class="text-xs text-tecuit-subtext">Infos en temps réel</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
-                        </button>
-
-                        <button class="feature-item flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors" onclick="activateFeature('Étudier et apprendre')">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
-                                <i class="fa-solid fa-book-open text-lg"></i>
-                            </div>
-                            <div class="text-left flex-1">
-                                <h4 class="font-medium text-sm">Étudier et apprendre</h4>
-                                <p class="text-xs text-tecuit-subtext">Nouveaux concepts</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-xs text-tecuit-subtext"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Model Selector Modal -->
-        <div id="model-modal" class="fixed inset-0 z-50 hidden">
-            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modelBackdrop"></div>
-            <div class="absolute inset-0 flex items-center justify-center p-4">
-                <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-fade-in">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold">Sélectionner le modèle</h3>
-                        <button id="closeModelBtn" class="text-tecuit-subtext hover:text-white">
-                            <i class="fa-solid fa-xmark text-xl"></i>
-                        </button>
-                    </div>
-                    <p class="text-sm text-tecuit-subtext mb-6">Choisissez l'IA adaptée à vos besoins.</p>
-                    
-                    <div class="space-y-3">
-                        <button class="model-option w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all" data-model="Hermes 4B">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-white">Hermes 4B</span>
-                                <span class="text-xs bg-tecuit-border px-2 py-1 rounded text-tecuit-subtext">Rapide</span>
-                            </div>
-                            <p class="text-xs text-tecuit-subtext">Idéal pour les tâches quotidiennes et la rapidité.</p>
-                        </button>
-
-                        <button class="model-option w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all" data-model="Hermes 7B">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-white">Hermes 7B</span>
-                                <span class="text-xs bg-indigo-900/50 text-indigo-300 px-2 py-1 rounded border border-indigo-500/30">Puissant</span>
-                            </div>
-                            <p class="text-xs text-tecuit-subtext">Meilleur pour le raisonnement complexe et le code.</p>
-                        </button>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-tecuit-border">
-                        <div class="flex items-center justify-between text-xs text-tecuit-subtext mb-2">
-                            <span>Mémoire utilisateur</span>
-                            <span>3.5GB / 10GB</span>
-                        </div>
-                        <div class="w-full h-2 bg-tecuit-border rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-tecuit-accent to-purple-500 w-[35%]"></div>
-                        </div>
-                        <p class="text-[10px] text-tecuit-subtext mt-2">10GB de stockage pour la continuité des conversations</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Menu Modal -->
-        <div id="menu-modal" class="fixed inset-0 z-50 hidden">
-            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="menuBackdrop"></div>
-            <div class="absolute inset-0 flex items-center justify-center p-4">
-                <div class="bg-tecuit-card border border-tecuit-border rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-fade-in">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold">Options</h3>
-                        <button id="closeMenuBtn" class="text-tecuit-subtext hover:text-white">
-                            <i class="fa-solid fa-xmark text-xl"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <button id="exportBtn" class="w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-tecuit-accent transition-all flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-tecuit-accent/10 flex items-center justify-center text-tecuit-accent">
-                                <i class="fa-solid fa-download"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium text-sm">Exporter la conversation</div>
-                                <div class="text-xs text-tecuit-subtext">Télécharger en JSON crypté</div>
-                            </div>
-                        </button>
-
-                        <button id="clearBtn" class="w-full text-left p-4 rounded-xl border border-tecuit-border bg-tecuit-dark/50 hover:border-red-500/50 transition-all flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400">
-                                <i class="fa-solid fa-trash"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium text-sm">Effacer la conversation</div>
-                                <div class="text-xs text-tecuit-subtext">Supprimer l'historique</div>
-                            </div>
-                        </button>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-tecuit-border text-center">
-                        <p class="text-xs text-tecuit-subtext">Tecuit IA v2.1.0</p>
-                        <p class="text-[10px] text-tecuit-subtext mt-1">
-                            <i class="fa-solid fa-shield-halved mr-1"></i> AES-256 Encryption + OCR
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Toast Notification -->
-        <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-tecuit-card border border-tecuit-border px-6 py-3 rounded-full shadow-xl z-50 transition-all duration-300 opacity-0 pointer-events-none">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-circle-info text-tecuit-accent"></i>
-                <span id="toast-message" class="text-sm">Notification</span>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ==================== CONFIGURATION ====================
-        const API_BASE_URL = 'https://zenkaritecuitai.ngrok.app';
-        const API_ENDPOINT = '/v1/chat/completions';
-        const MODEL_MAP = {
-            'Hermes 4B': 'nousresearch/nous-hermes-2-mistral-7b-dpo',
-            'Hermes 7B': 'nousresearch/nous-hermes-2-mistral-7b-dpo'
-        };
-        const ENCRYPTION_KEY = 'TecuitIA-SecretKey-2024-AES256';
-        const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB for OCR
-
-        // ==================== STATE ====================
-        let currentUser = null;
-        let currentModel = 'Hermes 4B';
-        let abortController = null;
-        let conversationHistory = [];
-        let conversations = [];
-        let currentConversationId = null;
-        let isGenerating = false;
-        let pendingFileContent = null;
-
-        // ==================== ENCRYPTION FUNCTIONS (AES-256) ====================
-        function encryptData(data) {
-            try {
-                const jsonString = JSON.stringify(data);
-                const encrypted = CryptoJS.AES.encrypt(jsonString, ENCRYPTION_KEY).toString();
-                return encrypted;
-            } catch (e) {
-                console.error('[Encryption] Error:', e);
-                return null;
-            }
-        }
-
-        function decryptData(encryptedData) {
-            try {
-                const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
-                const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
-                if (!decryptedString) return null;
-                return JSON.parse(decryptedString);
-            } catch (e) {
-                console.error('[Decryption] Error:', e);
-                return null;
-            }
-        }
-
-        function hashPassword(password) {
-            return CryptoJS.SHA256(password).toString();
-        }
-
-        // ==================== AUTHENTICATION ====================
-        function showLogin() {
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('register-form').classList.add('hidden');
-        }
-
-        function showRegister() {
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('register-form').classList.remove('hidden');
-        }
-
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        function checkAuth() {
-            const savedUser = localStorage.getItem('tecuit_current_user');
-            if (savedUser) {
-                currentUser = decryptData(savedUser);
-                if (currentUser) {
-                    showMainApp();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function registerUser(username, email, password) {
-            const users = getUsers();
-            
-            if (users.find(u => u.email === email)) {
-                showToast('Cet email est déjà utilisé');
-                return false;
-            }
-
-            const newUser = {
-                id: 'user_' + Date.now(),
-                username: username,
-                email: email,
-                password: hashPassword(password),
-                createdAt: new Date().toISOString(),
-                memoryUsed: 0,
-                memoryMax: 10 * 1024 * 1024 * 1024
-            };
-
-            users.push(newUser);
-            saveUsers(users);
-            loginUser(email, password);
-            return true;
-        }
-
-        function loginUser(email, password) {
-            const users = getUsers();
-            const user = users.find(u => u.email === email && u.password === hashPassword(password));
-            
-            if (!user) {
-                showToast('Email ou mot de passe incorrect');
-                return false;
-            }
-
-            currentUser = user;
-            localStorage.setItem('tecuit_current_user', encryptData(user));
-            showMainApp();
-            return true;
-        }
-
-        function logoutUser() {
-            currentUser = null;
-            localStorage.removeItem('tecuit_current_user');
-            document.getElementById('main-app').classList.remove('active');
-            document.getElementById('auth-pages').classList.add('active');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('register-form').classList.add('hidden');
-            showToast('Déconnecté avec succès');
-        }
-
-        function getUsers() {
-            const encrypted = localStorage.getItem('tecuit_users');
-            if (!encrypted) return [];
-            return decryptData(encrypted) || [];
-        }
-
-        function saveUsers(users) {
-            const encrypted = encryptData(users);
-            localStorage.setItem('tecuit_users', encrypted);
-        }
-
-        function getUserConversations(userId) {
-            const encrypted = localStorage.getItem('tecuit_conversations_' + userId);
-            if (!encrypted) return [];
-            return decryptData(encrypted) || [];
-        }
-
-        function saveUserConversations(userId, convs) {
-            const encrypted = encryptData(convs);
-            localStorage.setItem('tecuit_conversations_' + userId, encrypted);
-            updateMemoryDisplay();
-        }
-
-        function showMainApp() {
-            document.getElementById('auth-pages').classList.remove('active');
-            document.getElementById('main-app').classList.add('active');
-            
-            document.getElementById('user-name-display').textContent = currentUser.username;
-            document.getElementById('user-initial').textContent = currentUser.username.charAt(0).toUpperCase();
-            
-            conversations = getUserConversations(currentUser.id);
-            createNewConversation();
-            renderConversationList();
-            addWelcomeMessage();
-            loadFromLocalStorage();
-            updateMemoryDisplay();
-        }
-
-        // ==================== DOM ELEMENTS ====================
-        const chatContainer = document.getElementById('chat-container');
-        const input = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('sendBtn');
-        const stopGenBtn = document.getElementById('stopGenBtn');
-        const stopButtonContainer = document.getElementById('stopButtonContainer');
-        const typingPreview = document.getElementById('typingPreview');
-        const currentModelDisplay = document.getElementById('current-model-display');
-        const conversationList = document.getElementById('conversation-list');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toast-message');
-        const fileInput = document.getElementById('fileInput');
-        const fileProgressContainer = document.getElementById('fileProgressContainer');
-        const fileProgressBar = document.getElementById('fileProgressBar');
-        const fileProgressPercent = document.getElementById('fileProgressPercent');
-        const fileProgressName = document.getElementById('fileProgressName');
-
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!checkAuth()) {
-                document.getElementById('auth-pages').classList.add('active');
-            }
-
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                loginUser(email, password);
+        addMessage(text, 'user');
+        input.value = '';
+        document.getElementById('typingPreview').style.display = 'none';
+        tecuitThinking.style.display = 'block';
+        stopGenBtn.style.display = 'inline-block';
+        chat.scrollTop = chat.scrollHeight;
+        
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
+                    messages: [{ role: 'user', content: text }],
+                    stream: true
+                })
             });
-
-            document.getElementById('registerForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const username = document.getElementById('register-username').value;
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                const confirm = document.getElementById('register-confirm').value;
-
-                if (password !== confirm) {
-                    showToast('Les mots de passe ne correspondent pas');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    showToast('Le mot de passe doit faire au moins 6 caractères');
-                    return;
-                }
-
-                registerUser(username, email, password);
-            });
-
-            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
-            setupEventListeners();
-        });
-
-        function setupEventListeners() {
-            document.getElementById('sidebarBtn').addEventListener('click', toggleSidebar);
-            document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
-            document.getElementById('newConversationBtn').addEventListener('click', newConversation);
-
-            document.getElementById('modelBtn').addEventListener('click', toggleModelSelector);
-            document.getElementById('closeModelBtn').addEventListener('click', toggleModelSelector);
-            document.getElementById('modelBackdrop').addEventListener('click', toggleModelSelector);
             
-            document.querySelectorAll('.model-option').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const model = this.getAttribute('data-model');
-                    selectModel(model);
-                });
-            });
-
-            document.getElementById('menuBtn').addEventListener('click', toggleMenu);
-            document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
-            document.getElementById('menuBackdrop').addEventListener('click', toggleMenu);
-            document.getElementById('exportBtn').addEventListener('click', exportConversation);
-            document.getElementById('clearBtn').addEventListener('click', clearConversation);
-
-            document.getElementById('newChatBtn').addEventListener('click', newConversation);
-            sendBtn.addEventListener('click', sendMessage);
-            stopGenBtn.addEventListener('click', stopGeneration);
-            document.getElementById('attachBtn').addEventListener('click', function() {
-                toggleBottomSheet(true);
-            });
-
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            input.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 128) + 'px';
-                updateTypingPreview();
-            });
-
-            fileInput.addEventListener('change', function(e) {
-                if (e.target.files[0]) {
-                    handleFileUpload(e.target.files[0]);
-                }
-            });
-
-            document.getElementById('sheet-backdrop').addEventListener('click', function() {
-                toggleBottomSheet(false);
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    toggleBottomSheet(false);
-                    toggleModelSelector();
-                    toggleMenu();
-                    closeSidebar();
-                }
-            });
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        }
-
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.add('-translate-x-full');
-        }
-
-        function toggleBottomSheet(show) {
-            const sheet = document.getElementById('bottom-sheet');
-            const backdrop = document.getElementById('sheet-backdrop');
-            const content = document.getElementById('sheet-content');
-            if (show) {
-                sheet.classList.remove('pointer-events-none');
-                backdrop.classList.remove('opacity-0');
-                content.classList.remove('translate-y-full');
-            } else {
-                sheet.classList.add('pointer-events-none');
-                backdrop.classList.add('opacity-0');
-                content.classList.add('translate-y-full');
-            }
-        }
-
-        function toggleModelSelector() {
-            const modal = document.getElementById('model-modal');
-            modal.classList.toggle('hidden');
-        }
-
-        function toggleMenu() {
-            const modal = document.getElementById('menu-modal');
-            modal.classList.toggle('hidden');
-        }
-
-        function selectModel(modelName) {
-            currentModel = modelName;
-            currentModelDisplay.textContent = modelName;
-            toggleModelSelector();
-            addSystemMessage('Modèle changé pour <strong>' + modelName + '</strong>');
-            showToast('Modèle ' + modelName + ' activé');
-        }
-
-        function activateFeature(featureName) {
-            toggleBottomSheet(false);
-            input.value = featureName + ': ';
-            input.focus();
-            showToast(featureName + ' activé');
-        }
-
-        function triggerFileUpload(type) {
-            toggleBottomSheet(false);
-            if (type === 'camera') {
-                fileInput.setAttribute('capture', 'environment');
-                fileInput.setAttribute('accept', 'image/*');
-            } else if (type === 'photos') {
-                fileInput.removeAttribute('capture');
-                fileInput.setAttribute('accept', 'image/*');
-            } else {
-                fileInput.removeAttribute('capture');
-                fileInput.setAttribute('accept', 'image/*,.pdf,.doc,.docx,.txt,.md,.json,.csv');
-            }
-            fileInput.click();
-        }
-
-        function showToast(message) {
-            toastMessage.textContent = message;
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(function() {
-                toast.classList.add('opacity-0', 'pointer-events-none');
-            }, 3000);
-        }
-
-        function updateFileProgress(percent, filename) {
-            fileProgressContainer.classList.remove('hidden');
-            fileProgressBar.style.width = percent + '%';
-            fileProgressPercent.textContent = percent + '%';
-            fileProgressName.textContent = filename;
-        }
-
-        function hideFileProgress() {
-            fileProgressContainer.classList.add('hidden');
-            fileProgressBar.style.width = '0%';
-        }
-
-        // ==================== CONVERSATION MANAGEMENT ====================
-        function createNewConversation() {
-            currentConversationId = 'conv_' + Date.now();
-            const conversation = {
-                id: currentConversationId,
-                title: 'Nouvelle conversation',
-                messages: [],
-                createdAt: new Date().toISOString(),
-                model: currentModel
-            };
-            conversations.unshift(conversation);
-            saveConversations();
-        }
-
-        function newConversation() {
-            saveCurrentConversation();
-            createNewConversation();
-            closeSidebar();
-            chatContainer.innerHTML = '';
-            conversationHistory = [];
-            addWelcomeMessage();
-            saveToLocalStorage();
-            renderConversationList();
-            showToast('Nouvelle conversation créée');
-        }
-
-        function saveCurrentConversation() {
-            const conv = conversations.find(function(c) { return c.id === currentConversationId; });
-            if (conv) {
-                conv.messages = conversationHistory.slice();
-                if (conversationHistory.length > 0) {
-                    const firstMsg = conversationHistory[0].content;
-                    conv.title = firstMsg.substring(0, 30) + (firstMsg.length > 30 ? '...' : '');
-                }
-                saveConversations();
-            }
-        }
-
-        function loadConversation(convId) {
-            saveCurrentConversation();
-            currentConversationId = convId;
-            const conv = conversations.find(function(c) { return c.id === convId; });
-            if (conv) {
-                conversationHistory = conv.messages || [];
-                currentModel = conv.model || 'Hermes 4B';
-                currentModelDisplay.textContent = currentModel;
-                renderConversation();
-            }
-            closeSidebar();
-        }
-
-        function saveConversations() {
-            if (currentUser) {
-                saveUserConversations(currentUser.id, conversations);
-            }
-            renderConversationList();
-        }
-
-        function renderConversationList() {
-            conversationList.innerHTML = '';
-            conversations.forEach(function(conv) {
-                const div = document.createElement('div');
-                div.className = 'p-3 rounded-xl cursor-pointer transition-all ' + 
-                    (conv.id === currentConversationId ? 'bg-tecuit-accent/20 border border-tecuit-accent/30' : 'hover:bg-tecuit-dark/50');
-                div.innerHTML = '<div class="font-medium text-sm truncate">' + conv.title + '</div>' +
-                    '<div class="text-xs text-tecuit-subtext mt-1">' + new Date(conv.createdAt).toLocaleDateString('fr-FR') + '</div>';
-                div.addEventListener('click', function() { loadConversation(conv.id); });
-                conversationList.appendChild(div);
-            });
-        }
-
-        function renderConversation() {
-            chatContainer.innerHTML = '';
-            if (conversationHistory.length === 0) {
-                addWelcomeMessage();
-            } else {
-                conversationHistory.forEach(function(msg) {
-                    appendMessage(msg.content, msg.role, false);
-                });
-            }
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('tecuit_chat_' + (currentUser ? currentUser.id : 'guest'));
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    conversationHistory = data.messages || [];
-                } catch (e) {
-                    console.error('Error loading chat history');
-                }
-            }
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('tecuit_chat_' + (currentUser ? currentUser.id : 'guest'), JSON.stringify({
-                messages: conversationHistory,
-                model: currentModel
-            }));
-        }
-
-        function updateMemoryDisplay() {
-            if (!currentUser) return;
-            const memoryUsed = new Blob([JSON.stringify(conversations)]).size;
-            currentUser.memoryUsed = memoryUsed;
-            const percent = (memoryUsed / currentUser.memoryMax) * 100;
-            document.getElementById('memory-display').textContent = formatBytes(memoryUsed) + ' / 10GB';
-            localStorage.setItem('tecuit_current_user', encryptData(currentUser));
-        }
-
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // ==================== MESSAGE FUNCTIONS ====================
-        function addWelcomeMessage() {
-            const html = '<div class="flex flex-col gap-2 ai-msg animate-fade-in">' +
-                '<div class="flex items-center gap-2 mb-1">' +
-                '<img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" class="w-6 h-6 rounded-full">' +
-                '<span class="text-xs font-bold text-tecuit-subtext">Tecuit IA</span>' +
-                '<span class="model-badge">' + currentModel + '</span>' +
-                '</div>' +
-                '<div class="message-bubble">' +
-                'Bonjour ' + (currentUser ? currentUser.username : '') + ' ! 👋 Je suis <strong class="gradient-text">Tecuit IA</strong>.<br><br>' +
-                'Je peux vous aider avec :<br>' +
-                '• Réponses intelligentes avec Hermes 4B/7B<br>' +
-                '• Analyse de fichiers (texte, images avec OCR)<br>' +
-                '• Recherche sur Internet<br>' +
-                '• Mémoire de 10GB pour la continuité<br><br>' +
-                '<span class="text-xs bg-tecuit-card border border-tecuit-border px-3 py-1.5 rounded-full text-tecuit-subtext">' +
-                '<i class="fa-solid fa-lock mr-1"></i> Données cryptées AES-256</span>' +
-                '</div></div>';
-            chatContainer.innerHTML = html;
-        }
-
-        function appendMessage(text, sender, save) {
-            if (save === undefined) save = true;
-            const div = document.createElement('div');
-            const isUser = sender === 'user';
-            const msgId = 'msg_' + Date.now();
+            if (!res.ok) throw new Error("Connection error");
             
-            div.className = 'flex flex-col gap-1 ' + (isUser ? 'user-msg self-end' : 'ai-msg') + ' animate-fade-in';
+            tecuitThinking.style.display = 'none';
+            const messageId = addMessage('', 'tecuit');
+            const tecuitDiv = document.getElementById(messageId);
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let fullReply = "";
             
-            let contentHtml = '';
-            
-            if (!isUser) {
-                contentHtml += '<div class="flex items-center gap-2 mb-1">' +
-                    '<img src="https://image.qwenlm.ai/public_source/5245a1d1-4ef5-4041-a494-a50a465be63f/168acf2cb-5624-4853-b301-b39eecec2b30.png" class="w-6 h-6 rounded-full">' +
-                    '<span class="text-xs font-bold text-tecuit-subtext">Tecuit IA</span>' +
-                    '<span class="model-badge">' + currentModel + '</span>' +
-                    '</div>';
-            }
-
-            contentHtml += '<div id="' + msgId + '" class="message-bubble ' + (isUser ? '' : '') + '">' + formatMessage(text) + '</div>';
-            
-            if (isUser) {
-                const now = new Date();
-                const time = now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
-                contentHtml += '<div class="text-right text-xs text-tecuit-subtext px-1">' + time + '</div>';
-            }
-
-            div.innerHTML = contentHtml;
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            if (save) {
-                conversationHistory.push({ 
-                    role: sender === 'tecuit' ? 'assistant' : sender, 
-                    content: text,
-                    displayRole: sender
-                });
-                saveToLocalStorage();
-                saveCurrentConversation();
-            }
-            
-            return msgId;
-        }
-
-        function formatMessage(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/`(.*?)`/g, '<code>$1</code>')
-                .replace(/\n/g, '<br>');
-        }
-
-        function addSystemMessage(html) {
-            const div = document.createElement('div');
-            div.className = 'flex justify-center my-4 animate-fade-in';
-            div.innerHTML = '<span class="text-xs bg-tecuit-card border border-tecuit-border text-tecuit-subtext px-3 py-1 rounded-full">' + html + '</span>';
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function updateTypingPreview() {
-            const text = input.value.trim();
-            if (text) {
-                const previewText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-                typingPreview.textContent = previewText;
-                typingPreview.style.display = 'block';
-            } else {
-                typingPreview.style.display = 'none';
-            }
-        }
-
-        // ==================== FILE PROCESSING (OCR + Text Extraction) ====================
-        async function handleFileUpload(file) {
-            if (!file) return;
-            
-            if (file.size > MAX_FILE_SIZE) {
-                showToast('⚠️ Fichier trop volumineux (max 50MB)');
-                return;
-            }
-
-            const filename = file.name;
-            const fileSize = formatBytes(file.size);
-            const fileType = file.type;
-
-            try {
-                let extractedText = '';
-
-                // Image files - Use OCR
-                if (fileType.startsWith('image/')) {
-                    updateFileProgress(0, 'OCR en cours...');
-                    
-                    const worker = await Tesseract.createWorker('fra');
-                    
-                    await worker.load();
-                    await worker.loadLanguage('fra');
-                    await worker.initialize('fra');
-
-                    const { data: { text, progress } } = await worker.recognize(file);
-                    
-                    await worker.terminate();
-                    
-                    extractedText = text;
-                    hideFileProgress();
-
-                    if (!extractedText.trim()) {
-                        showToast('⚠️ Aucun texte détecté dans l\'image');
-                        return;
-                    }
-
-                    showToast('✅ OCR terminé - ' + extractedText.length + ' caractères');
-
-                } 
-                // Text files
-                else if (fileType === 'text/plain' || fileType === 'text/markdown' || 
-                         filename.endsWith('.txt') || filename.endsWith('.md')) {
-                    extractedText = await readTextFile(file);
-                    
-                } 
-                // JSON files
-                else if (fileType === 'application/json' || filename.endsWith('.json')) {
-                    extractedText = await readTextFile(file);
-                    
-                } 
-                // CSV files
-                else if (fileType === 'text/csv' || filename.endsWith('.csv')) {
-                    extractedText = await readTextFile(file);
-                    
-                } 
-                // PDF/DOC/DOCX - Not supported in browser, show message
-                else if (fileType === 'application/pdf' || filename.endsWith('.pdf')) {
-                    showToast('⚠️ Les fichiers PDF ne sont pas supportés. Convertissez en texte d\'abord.');
-                    return;
-                    
-                } else if (fileType === 'application/msword' || filename.endsWith('.doc') || filename.endsWith('.docx')) {
-                    showToast('⚠️ Les fichiers Word ne sont pas supportés. Convertissez en texte d\'abord.');
-                    return;
-                } 
-                // Unknown file type
-                else {
-                    extractedText = await readTextFile(file);
-                }
-
-                // Store extracted text for sending with message
-                pendingFileContent = {
-                    filename: filename,
-                    size: fileSize,
-                    type: fileType,
-                    content: extractedText
-                };
-
-                // Show file info in chat
-                const fileInfo = '📎 **Fichier analysé:** ' + filename + '\n' +
-                                 '**Taille:** ' + fileSize + '\n' +
-                                 '**Type:** ' + (fileType || 'inconnu') + '\n' +
-                                 '**Texte extrait:** ' + extractedText.length + ' caractères\n\n' +
-                                 '--- Contenu du fichier ---\n' +
-                                 extractedText.substring(0, 500) + (extractedText.length > 500 ? '...' : '');
-
-                appendMessage(fileInfo, 'user');
-                input.value = 'Analyse ce fichier: ';
-                input.focus();
-
-                showToast('✅ Fichier traité avec succès');
-
-            } catch (error) {
-                console.error('[File Upload] Error:', error);
-                hideFileProgress();
-                showToast('❌ Erreur lors du traitement: ' + error.message);
-            }
-        }
-
-        function readTextFile(file) {
-            return new Promise(function(resolve, reject) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    resolve(e.target.result);
-                };
-                reader.onerror = function() {
-                    reject(new Error('Erreur de lecture du fichier'));
-                };
-                reader.readAsText(file);
-            });
-        }
-
-        // ==================== SEND MESSAGE (FIXED API) ====================
-        async function sendMessage() {
-            const text = input.value.trim();
-            if (!text && !pendingFileContent || isGenerating) return;
-
-            // Build message with file content if exists
-            let fullMessage = text;
-            if (pendingFileContent) {
-                fullMessage = text + '\n\n--- CONTENU DU FICHIER ---\n' + pendingFileContent.content;
-                pendingFileContent = null;
-            }
-
-            appendMessage(text || '📎 Fichier envoyé', 'user');
-            input.value = '';
-            input.style.height = 'auto';
-            typingPreview.style.display = 'none';
-            stopButtonContainer.classList.remove('hidden');
-            isGenerating = true;
-
-            abortController = new AbortController();
-            const signal = abortController.signal;
-
-            try {
-                const res = await fetch(API_BASE_URL + API_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'text/event-stream'
-                    },
-                    body: JSON.stringify({
-                        model: MODEL_MAP[currentModel],
-                        messages: conversationHistory
-                            .filter(function(m) {
-                                return m.role === 'user' || m.role === 'assistant';
-                            })
-                            .map(function(m) {
-                                return { 
-                                    role: m.role, 
-                                    content: m.content 
-                                };
-                            }),
-                        stream: true,
-                        temperature: 0.7,
-                        max_tokens: 2048
-                    }),
-                    signal: signal
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.text();
-                    throw new Error('Erreur serveur: ' + res.status + ' - ' + errorData.substring(0, 200));
-                }
-
-                const messageId = appendMessage('', 'tecuit', false);
-                const tecuitDiv = document.getElementById(messageId);
-                tecuitDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-                
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder();
-                let fullReply = '';
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
-                    
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i];
-                        if (line.includes('data:')) {
-                            const dataStr = line.replace('data:', '').trim();
-                            if (dataStr === '[DONE]' || dataStr === '') continue;
-                            
-                            try {
-                                const json = JSON.parse(dataStr);
-                                const content = json.choices && json.choices[0] && json.choices[0].delta ? (json.choices[0].delta.content || '') : '';
-                                fullReply += content;
-                                
-                                if (tecuitDiv && fullReply) {
-                                    tecuitDiv.innerHTML = formatMessage(fullReply);
-                                }
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
-                            } catch (e) {
-                                console.log('Parse error:', e);
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split("\n");
+                for (const line of lines) {
+                    if (line.startsWith("data: ")) {
+                        const dataStr = line.replace("data: ", "").trim();
+                        if (dataStr === "[DONE]") break;
+                        try {
+                            const json = JSON.parse(dataStr);
+                            const content = json.choices[0].delta?.content || "";
+                            fullReply += content;
+                            if (tecuitDiv) {
+                                tecuitDiv.innerText = fullReply;
                             }
+                            chat.scrollTop = chat.scrollHeight;
+                        } catch (e) {
+                            // Ignore JSON parse errors for partial chunks
                         }
                     }
                 }
-                
-                if (fullReply) {
-                    conversationHistory.push({ 
-                        role: 'assistant', 
-                        content: fullReply,
-                        displayRole: 'tecuit'
-                    });
-                    saveToLocalStorage();
-                    saveCurrentConversation();
-                }
-                
-                stopButtonContainer.classList.add('hidden');
-                isGenerating = false;
-
-            } catch (err) {
-                console.error('API Error:', err);
-                if (err.name === 'AbortError') {
-                    const lastAiMsg = chatContainer.querySelectorAll('.ai-msg .message-bubble');
-                    if (lastAiMsg.length > 0) {
-                        lastAiMsg[lastAiMsg.length - 1].innerHTML += '<br><br><em class="text-tecuit-subtext">[Génération arrêtée]</em>';
-                    }
-                } else {
-                    const errorHtml = '<div class="error-message">' +
-                        '<strong>⚠️ Erreur de connexion</strong><br>' +
-                        err.message + '<br><br>' +
-                        '<small>Assurez-vous que le backend est accessible.</small>' +
-                        '</div>';
-                    appendMessage(errorHtml, 'tecuit');
-                }
-                stopButtonContainer.classList.add('hidden');
-                isGenerating = false;
-            }
-        }
-
-        function stopGeneration() {
-            if (abortController) {
-                abortController.abort();
-                abortController = null;
-                isGenerating = false;
-                stopButtonContainer.classList.add('hidden');
-                showToast('Génération arrêtée');
-            }
-        }
-
-        // ==================== CONVERSATION UTILS ====================
-        function clearConversation() {
-            if (!confirm('Voulez-vous vraiment supprimer toute la conversation ?')) return;
-            
-            chatContainer.innerHTML = '';
-            conversationHistory = [];
-            saveToLocalStorage();
-            
-            const conv = conversations.find(function(c) { return c.id === currentConversationId; });
-            if (conv) {
-                conv.messages = [];
-                saveConversations();
             }
             
-            addWelcomeMessage();
-            toggleMenu();
-            showToast('Conversation effacée');
+            stopGenBtn.style.display = 'none';
+            conversationHistory.push({ role: 'user', content: text });
+            conversationHistory.push({ role: 'assistant', content: fullReply });
+            
+        } catch (err) {
+            tecuitThinking.style.display = 'none';
+            stopGenBtn.style.display = 'none';
+            addMessage('Connection error: ' + err.message, 'tecuit');
         }
+    }
+    
+    function stopGeneration() {
+        if (abortController) {
+            abortController.abort();
+            abortController = null;
+            document.getElementById('stopGenBtn').style.display = 'none';
+        }
+    }
+    
+    sendBtn.addEventListener('click', sendMessage);
+    fileUploadBtn.addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+    });
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
+}
 
-        function exportConversation() {
-            const messages = conversationHistory.map(function(msg) {
-                return {
-                    from: msg.displayRole || msg.role,
-                    text: msg.content,
-                    timestamp: new Date().toISOString()
-                };
-            });
-            
-            const exportData = {
-                user: currentUser ? currentUser.email : 'anonymous',
-                exportedAt: new Date().toISOString(),
-                encrypted: true,
-                data: encryptData(messages)
-            };
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'tecuit_chat_encrypted_' + Date.now() + '.json';
-            a.click();
-            window.URL.revokeObjectURL(url);
-            
-            toggleMenu();
-            showToast('Conversation exportée (cryptée)');
+function updateTypingPreview() {
+    const input = document.getElementById('chat-input');
+    const preview = document.getElementById('typingPreview');
+    const text = input.value.trim();
+    if (text) {
+        const previewText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+        preview.textContent = previewText;
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+function handleFileUpload(file) {
+    if (!file) return;
+    if (file.size > 500 * 1024 * 1024) {
+        alert('⚠️ File too large (max 500MB)');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const filename = file.name;
+        const message = `📎 File sent: ${filename}\nSize: ${(file.size / 1024).toFixed(2)} KB`;
+        document.getElementById('chat-input').value = message;
+        updateTypingPreview();
+    };
+    reader.readAsText(file);
+}
+
+function clearConversation() {
+    if (!confirm("Delete the entire conversation?")) return;
+    const chat = document.getElementById("chat");
+    chat.innerHTML = "";
+    conversationHistory = [];
+    localStorage.removeItem("zenkari_chat");
+}
+
+function exportConversation() {
+    const chat = document.getElementById("chat");
+    const messages = Array.from(chat.querySelectorAll('.msg')).map(msg => ({
+        from: msg.classList.contains('user') ? 'user' : 'tecuit',
+        text: msg.textContent
+    }));
+    const blob = new Blob([JSON.stringify(messages, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `zenkari_chat_${Date.now()}.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function toggleAITheme() {
+    const chat = document.getElementById('chat');
+    if (chat.style.background === 'rgb(42, 47, 58)') {
+        chat.style.background = '#1f1f1f';
+    } else {
+        chat.style.background = '#2a2f3a';
+    }
+}
+
+// ==================== ANIMATIONS ====================
+document.addEventListener('DOMContentLoaded', function() {
+    initLanguage();
+    initChat();
+    
+    const cards = document.querySelectorAll('.app-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+});
+
+document.querySelectorAll('.app-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('launch-btn') && !e.target.closest('.launch-btn')) {
+            const btn = this.querySelector('.launch-btn');
+            if (btn) btn.click();
         }
-    </script>
+    });
+});
+
+document.getElementById('chat-input').addEventListener('input', updateTypingPreview);
+</script>
 </body>
 </html>
-```
-
