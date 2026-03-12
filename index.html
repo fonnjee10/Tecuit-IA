@@ -141,6 +141,14 @@
         .glow-effect {
             box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
         }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
@@ -198,7 +206,7 @@
                     </div>
                     <div class="flex-1">
                         <div class="font-medium text-sm">Utilisateur</div>
-                        <div class="text-xs text-tecuit-subtext">3.5GB / 10GB utilisé</div>
+                        <div class="text-xs text-tecuit-subtext" id="memory-display">3.5GB / 10GB utilisé</div>
                     </div>
                 </div>
             </div>
@@ -229,7 +237,7 @@
             <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-white placeholder-tecuit-subtext focus:outline-none resize-none py-3 max-h-32" placeholder="Message Tecuit..."></textarea>
             
             <button id="sendBtn" class="p-3 bg-tecuit-accent text-white rounded-xl hover:bg-tecuit-accentHover transition-colors flex-shrink-0 shadow-md shadow-indigo-500/20">
-                <i class="fa-solid fa-paper-plane text-sm"></i>
+                <i class="fa-solid fa-arrow-up text-sm"></i>
             </button>
         </div>
         <div class="text-center mt-2">
@@ -465,15 +473,14 @@
         });
 
         function setupEventListeners() {
-            // Sidebar
             document.getElementById('sidebarBtn').addEventListener('click', toggleSidebar);
             document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
             document.getElementById('newConversationBtn').addEventListener('click', newConversation);
 
-            // Model Selector
             document.getElementById('modelBtn').addEventListener('click', toggleModelSelector);
             document.getElementById('closeModelBtn').addEventListener('click', toggleModelSelector);
             document.getElementById('modelBackdrop').addEventListener('click', toggleModelSelector);
+            
             document.querySelectorAll('.model-option').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const model = this.getAttribute('data-model');
@@ -481,14 +488,12 @@
                 });
             });
 
-            // Menu
             document.getElementById('menuBtn').addEventListener('click', toggleMenu);
             document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
             document.getElementById('menuBackdrop').addEventListener('click', toggleMenu);
             document.getElementById('exportBtn').addEventListener('click', exportConversation);
             document.getElementById('clearBtn').addEventListener('click', clearConversation);
 
-            // Chat
             document.getElementById('newChatBtn').addEventListener('click', newConversation);
             sendBtn.addEventListener('click', sendMessage);
             stopGenBtn.addEventListener('click', stopGeneration);
@@ -496,7 +501,6 @@
                 toggleBottomSheet(true);
             });
 
-            // Input
             input.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -510,19 +514,16 @@
                 updateTypingPreview();
             });
 
-            // File Upload
             fileInput.addEventListener('change', function(e) {
                 if (e.target.files[0]) {
                     handleFileUpload(e.target.files[0]);
                 }
             });
 
-            // Bottom Sheet
             document.getElementById('sheet-backdrop').addEventListener('click', function() {
                 toggleBottomSheet(false);
             });
 
-            // Escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     toggleBottomSheet(false);
@@ -758,7 +759,8 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             if (save) {
-                conversationHistory.push({ role: sender, content: text });
+                // FIX: Use 'assistant' for API compatibility, not 'tecuit'
+                conversationHistory.push({ role: sender === 'tecuit' ? 'assistant' : sender, content: text });
                 saveToLocalStorage();
                 saveCurrentConversation();
             }
@@ -793,7 +795,7 @@
             }
         }
 
-        // ==================== SEND MESSAGE (REAL API) ====================
+        // ==================== SEND MESSAGE (FIXED API) ====================
         async function sendMessage() {
             const text = input.value.trim();
             if (!text || isGenerating) return;
@@ -809,21 +811,34 @@
             const signal = abortController.signal;
 
             try {
-                const res = await fetch(API_BASE_URL + '/api/chat', {
+                // FIX: Use /v1/chat/completions endpoint
+                const res = await fetch(API_BASE_URL + '/v1/chat/completions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream'
+                    },
                     body: JSON.stringify({
                         model: MODEL_MAP[currentModel],
-                        messages: conversationHistory.map(function(m) {
-                            return { role: m.role, content: m.content };
+                        // FIX: Filter messages to only include valid roles (user, assistant)
+                        messages: conversationHistory.filter(function(m) {
+                            return m.role === 'user' || m.role === 'assistant';
+                        }).map(function(m) {
+                            return { 
+                                role: m.role, 
+                                content: m.content 
+                            };
                         }),
-                        stream: true
+                        stream: true,
+                        temperature: 0.7,
+                        max_tokens: 2048
                     }),
                     signal: signal
                 });
 
                 if (!res.ok) {
-                    throw new Error('Erreur serveur: ' + res.status);
+                    const errorData = await res.text();
+                    throw new Error('Erreur serveur: ' + res.status + ' - ' + errorData.substring(0, 200));
                 }
 
                 const messageId = appendMessage('', 'tecuit', false);
@@ -844,42 +859,49 @@
                     for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
                         if (line.startsWith('data: ')) {
-                            const dataStr = line.replace(' ', '').trim();
-                            if (dataStr === '[DONE]') break;
+                            const dataStr = line.replace('data: ', '').trim();
+                            if (dataStr === '[DONE]' || dataStr === '') break;
                             
                             try {
                                 const json = JSON.parse(dataStr);
-                                const content = json.choices[0].delta?.content || '';
+                                const content = json.choices && json.choices[0] && json.choices[0].delta ? (json.choices[0].delta.content || '') : '';
                                 fullReply += content;
                                 
-                                if (tecuitDiv) {
+                                if (tecuitDiv && fullReply) {
                                     tecuitDiv.innerHTML = formatMessage(fullReply);
                                 }
                                 chatContainer.scrollTop = chatContainer.scrollHeight;
                             } catch (e) {
-                                // Ignore partial JSON
+                                console.log('Parse error:', e);
                             }
                         }
                     }
                 }
                 
-                conversationHistory.push({ role: 'tecuit', content: fullReply });
-                saveToLocalStorage();
-                saveCurrentConversation();
+                if (fullReply) {
+                    // FIX: Save as 'assistant' for API compatibility
+                    conversationHistory.push({ role: 'assistant', content: fullReply });
+                    saveToLocalStorage();
+                    saveCurrentConversation();
+                }
                 
                 stopButtonContainer.classList.add('hidden');
                 isGenerating = false;
 
             } catch (err) {
+                console.error('API Error:', err);
                 if (err.name === 'AbortError') {
-                    console.log('Génération arrêtée');
                     const lastAiMsg = chatContainer.querySelectorAll('.ai-msg .message-bubble');
                     if (lastAiMsg.length > 0) {
                         lastAiMsg[lastAiMsg.length - 1].innerHTML += '<br><br><em class="text-tecuit-subtext">[Génération arrêtée]</em>';
                     }
                 } else {
-                    console.error(err);
-                    appendMessage('Erreur de connexion: ' + err.message + '<br><br><small>Vérifiez que le backend est accessible.</small>', 'tecuit');
+                    const errorHtml = '<div class="error-message">' +
+                        '<strong>⚠️ Erreur de connexion</strong><br>' +
+                        err.message + '<br><br>' +
+                        '<small>Assurez-vous que le backend est accessible et que CORS est configuré.</small>' +
+                        '</div>';
+                    appendMessage(errorHtml, 'tecuit');
                 }
                 stopButtonContainer.classList.add('hidden');
                 isGenerating = false;
