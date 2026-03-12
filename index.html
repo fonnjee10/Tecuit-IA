@@ -576,11 +576,12 @@
     <script>
         // ==================== CONFIGURATION ====================
         const API_BASE_URL = 'https://zenkaritecuitai.ngrok.app';
+        const API_ENDPOINT = '/v1/chat/completions';
         const MODEL_MAP = {
             'Hermes 4B': 'nousresearch/nous-hermes-2-mistral-7b-dpo',
             'Hermes 7B': 'nousresearch/nous-hermes-2-mistral-7b-dpo'
         };
-        const ENCRYPTION_KEY = 'TecuitIA-SecretKey-2024-AES256'; // In production, use user password
+        const ENCRYPTION_KEY = 'TecuitIA-SecretKey-2024-AES256';
 
         // ==================== STATE ====================
         let currentUser = null;
@@ -667,8 +668,6 @@
 
             users.push(newUser);
             saveUsers(users);
-            
-            // Auto login
             loginUser(email, password);
             return true;
         }
@@ -725,11 +724,9 @@
             document.getElementById('auth-pages').classList.remove('active');
             document.getElementById('main-app').classList.add('active');
             
-            // Load user data
             document.getElementById('user-name-display').textContent = currentUser.username;
             document.getElementById('user-initial').textContent = currentUser.username.charAt(0).toUpperCase();
             
-            // Load conversations
             conversations = getUserConversations(currentUser.id);
             createNewConversation();
             renderConversationList();
@@ -753,12 +750,10 @@
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
             if (!checkAuth()) {
                 document.getElementById('auth-pages').classList.add('active');
             }
 
-            // Auth Forms
             document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const email = document.getElementById('login-email').value;
@@ -786,10 +781,7 @@
                 registerUser(username, email, password);
             });
 
-            // Logout
             document.getElementById('logoutBtn').addEventListener('click', logoutUser);
-
-            // Setup main app listeners
             setupEventListeners();
         });
 
@@ -1032,14 +1024,10 @@
 
         function updateMemoryDisplay() {
             if (!currentUser) return;
-            
             const memoryUsed = new Blob([JSON.stringify(conversations)]).size;
             currentUser.memoryUsed = memoryUsed;
             const percent = (memoryUsed / currentUser.memoryMax) * 100;
-            
             document.getElementById('memory-display').textContent = formatBytes(memoryUsed) + ' / 10GB';
-            
-            // Update user in storage
             localStorage.setItem('tecuit_current_user', encryptData(currentUser));
         }
 
@@ -1060,7 +1048,7 @@
                 '<span class="model-badge">' + currentModel + '</span>' +
                 '</div>' +
                 '<div class="message-bubble">' +
-                'Bonjour ' + (currentUser ? currentUser.username : '') + ' ! 👋 Je suis <strong class="gradient-text">Tecuit IA</strong>, votre assistant intelligent.<br><br>' +
+                'Bonjour ' + (currentUser ? currentUser.username : '') + ' ! 👋 Je suis <strong class="gradient-text">Tecuit IA</strong>.<br><br>' +
                 'Je peux vous aider avec :<br>' +
                 '• Réponses intelligentes avec Hermes 4B/7B<br>' +
                 '• Génération d\'images<br>' +
@@ -1103,7 +1091,12 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             if (save) {
-                conversationHistory.push({ role: sender === 'tecuit' ? 'assistant' : sender, content: text });
+                // FIX: Use 'assistant' for API, 'tecuit' for display
+                conversationHistory.push({ 
+                    role: sender === 'tecuit' ? 'assistant' : sender, 
+                    content: text,
+                    displayRole: sender
+                });
                 saveToLocalStorage();
                 saveCurrentConversation();
             }
@@ -1138,7 +1131,7 @@
             }
         }
 
-        // ==================== SEND MESSAGE ====================
+        // ==================== SEND MESSAGE (FIXED API) ====================
         async function sendMessage() {
             const text = input.value.trim();
             if (!text || isGenerating) return;
@@ -1154,7 +1147,8 @@
             const signal = abortController.signal;
 
             try {
-                const res = await fetch(API_BASE_URL + '/v1/chat/completions', {
+                // FIX: Use /v1/chat/completions endpoint
+                const res = await fetch(API_BASE_URL + API_ENDPOINT, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -1162,11 +1156,17 @@
                     },
                     body: JSON.stringify({
                         model: MODEL_MAP[currentModel],
-                        messages: conversationHistory.filter(function(m) {
-                            return m.role === 'user' || m.role === 'assistant';
-                        }).map(function(m) {
-                            return { role: m.role, content: m.content };
-                        }),
+                        // FIX: Filter and map messages correctly for API
+                        messages: conversationHistory
+                            .filter(function(m) {
+                                return m.role === 'user' || m.role === 'assistant';
+                            })
+                            .map(function(m) {
+                                return { 
+                                    role: m.role, 
+                                    content: m.content 
+                                };
+                            }),
                         stream: true,
                         temperature: 0.7,
                         max_tokens: 2048
@@ -1196,9 +1196,10 @@
                     
                     for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
-                        if (line.startsWith(' ')) {
-                            const dataStr = line.replace('data: ', '').trim();
-                            if (dataStr === '[DONE]' || dataStr === '') break;
+                        // FIX: Check for ' data: ' or 'data: ' prefix
+                        if (line.includes('data:')) {
+                            const dataStr = line.replace('data:', '').trim();
+                            if (dataStr === '[DONE]' || dataStr === '') continue;
                             
                             try {
                                 const json = JSON.parse(dataStr);
@@ -1217,7 +1218,12 @@
                 }
                 
                 if (fullReply) {
-                    conversationHistory.push({ role: 'assistant', content: fullReply });
+                    // FIX: Save as 'assistant' for API compatibility
+                    conversationHistory.push({ 
+                        role: 'assistant', 
+                        content: fullReply,
+                        displayRole: 'tecuit'
+                    });
                     saveToLocalStorage();
                     saveCurrentConversation();
                 }
@@ -1302,13 +1308,12 @@
         function exportConversation() {
             const messages = conversationHistory.map(function(msg) {
                 return {
-                    from: msg.role === 'user' ? 'utilisateur' : 'tecuit',
+                    from: msg.displayRole || msg.role,
                     text: msg.content,
                     timestamp: new Date().toISOString()
                 };
             });
             
-            // Export with encryption option
             const exportData = {
                 user: currentUser ? currentUser.email : 'anonymous',
                 exportedAt: new Date().toISOString(),
