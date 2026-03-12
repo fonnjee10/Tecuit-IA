@@ -816,15 +816,9 @@
                     body: JSON.stringify({
                         model: 'nousresearch/nous-hermes-2-mistral-7b-dpo',
                         messages: conversationHistory.map(function(m) {
-
-                                let role = m.role;
-
-               // conversion pour LM Studio
-                             if (role === "tecuit") role = "assistant";
-
-                              return {
-                            role: role,
+                            role: m.role === "tecuit" ? "assistant" : m.role,
                             content: m.content
+                        }))
                         };
 
                        })
@@ -984,4 +978,5 @@
     </script>
 </body>
 </html>
+
 
